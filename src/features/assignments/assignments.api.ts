@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/src/lib/supabase';
 import { AssignmentInsert, AssignmentWithDetails } from './assignments.types';
-import { scheduleAssignmentNotifications, cancelAssignmentNotifications } from '@/lib/notifications';
+import { scheduleAssignmentNotifications, cancelAssignmentNotifications } from '@/src/lib/notifications';
 
 export function useMyAssignments() {
   return useQuery({

@@ -10,32 +10,49 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useScheduleById } from '@/features/schedules/schedules.api';
-import { useSlotsBySchedule } from '@/features/slots/slots.api';
-import { useAssignToSlot, useUnassignFromSlot } from '@/features/assignments/assignments.api';
-import { useAuth } from '@/features/auth/useAuth';
-import { Card } from '@/components/Card';
-import { Button } from '@/components/Button';
-import { SlotItem } from '@/components/SlotItem';
-import { EmptyState } from '@/components/EmptyState';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { formatDate } from '@/utils/dates';
-import { supabase } from '@/lib/supabase';
-import { ArrowLeft, Settings, Plus, Calendar, FileText } from 'lucide-react-native';
+import { useScheduleById } from '@/src/features/schedules/schedules.api';
+import { useSlotsBySchedule } from '@/src/features/slots/slots.api';
+import {
+  useAssignToSlot,
+  useUnassignFromSlot,
+} from '@/src/features/assignments/assignments.api';
+import { useAuth } from '@/src/features/auth/useAuth';
+import { Card } from '@/src/components/Card';
+import { Button } from '@/src/components/Button';
+import { SlotItem } from '@/src/components/SlotItem';
+import { EmptyState } from '@/src/components/EmptyState';
+import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { formatDate } from '@/src/utils/dates';
+import { supabase } from '@/src/lib/supabase';
+import {
+  ArrowLeft,
+  Settings,
+  Plus,
+  Calendar,
+  FileText,
+} from 'lucide-react-native';
 
 export default function ScheduleDetailScreen() {
   const router = useRouter();
   const { scheduleId } = useLocalSearchParams<{ scheduleId: string }>();
   const { user, isAdmin } = useAuth();
-  
-  const { data: schedule, isLoading: scheduleLoading } = useScheduleById(scheduleId!);
-  const { data: slots, isLoading: slotsLoading, refetch } = useSlotsBySchedule(scheduleId!);
-  
+
+  const { data: schedule, isLoading: scheduleLoading } = useScheduleById(
+    scheduleId!
+  );
+  const {
+    data: slots,
+    isLoading: slotsLoading,
+    refetch,
+  } = useSlotsBySchedule(scheduleId!);
+
   const assignToSlot = useAssignToSlot();
   const unassignFromSlot = useUnassignFromSlot();
-  
+
   const [assigningSlotId, setAssigningSlotId] = useState<string | null>(null);
-  const [unassigningAssignmentId, setUnassigningAssignmentId] = useState<string | null>(null);
+  const [unassigningAssignmentId, setUnassigningAssignmentId] = useState<
+    string | null
+  >(null);
 
   // Real-time subscription
   useEffect(() => {
@@ -43,13 +60,20 @@ export default function ScheduleDetailScreen() {
 
     const channel = supabase
       .channel('realtime:schedule')
-      .on('postgres_changes',
-          { event: '*', schema: 'public', table: 'slots', filter: `schedule_id=eq.${scheduleId}` },
-          () => refetch()
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'slots',
+          filter: `schedule_id=eq.${scheduleId}`,
+        },
+        () => refetch()
       )
-      .on('postgres_changes',
-          { event: '*', schema: 'public', table: 'assignments' },
-          () => refetch()
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'assignments' },
+        () => refetch()
       )
       .subscribe();
 
@@ -81,8 +105,8 @@ export default function ScheduleDetailScreen() {
       'Tem certeza que deseja cancelar sua inscrição?',
       [
         { text: 'Não', style: 'cancel' },
-        { 
-          text: 'Sim', 
+        {
+          text: 'Sim',
           style: 'destructive',
           onPress: async () => {
             setUnassigningAssignmentId(assignmentId);
@@ -94,7 +118,7 @@ export default function ScheduleDetailScreen() {
             } finally {
               setUnassigningAssignmentId(null);
             }
-          }
+          },
         },
       ]
     );
@@ -116,10 +140,14 @@ export default function ScheduleDetailScreen() {
   }
 
   const renderSlotItem = ({ item }: { item: any }) => {
-    const userAssignment = item.assignments.find((a: any) => a.user.id === user?.id);
+    const userAssignment = item.assignments.find(
+      (a: any) => a.user.id === user?.id
+    );
     const isAssigned = !!userAssignment;
-    const canAssign = !isAssigned && item.available_spots > 0 && 
-                     (item.mode === 'livre' || isAdmin);
+    const canAssign =
+      !isAssigned &&
+      item.available_spots > 0 &&
+      (item.mode === 'livre' || isAdmin);
     const canUnassign = isAssigned;
     const canManage = isAdmin;
 
@@ -130,10 +158,17 @@ export default function ScheduleDetailScreen() {
         canUnassign={canUnassign}
         canManage={canManage}
         isAssigned={isAssigned}
-        loading={assigningSlotId === item.id || unassigningAssignmentId === userAssignment?.id}
+        loading={
+          assigningSlotId === item.id ||
+          unassigningAssignmentId === userAssignment?.id
+        }
         onAssign={() => handleAssignToSlot(item.id)}
-        onUnassign={() => userAssignment && handleUnassignFromSlot(userAssignment.id)}
-        onManage={() => router.push(`/schedules/${scheduleId}/manage?slotId=${item.id}`)}
+        onUnassign={() =>
+          userAssignment && handleUnassignFromSlot(userAssignment.id)
+        }
+        onManage={() =>
+          router.push(`/schedules/${scheduleId}/manage?slotId=${item.id}`)
+        }
       />
     );
   };
@@ -141,14 +176,17 @@ export default function ScheduleDetailScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <ArrowLeft size={24} color="#374151" strokeWidth={2} />
         </TouchableOpacity>
         <Text style={styles.title} numberOfLines={1}>
           {schedule.title}
         </Text>
         {isAdmin && (
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.push(`/schedules/${scheduleId}/manage`)}
             style={styles.manageButton}
           >
@@ -181,7 +219,9 @@ export default function ScheduleDetailScreen() {
               <Text style={styles.notificationText}>• Lembrete 24h</Text>
             )}
             {schedule.notify_48h && (
-              <Text style={styles.notificationText}>• Lembrete 48h (Professores)</Text>
+              <Text style={styles.notificationText}>
+                • Lembrete 48h (Professores)
+              </Text>
             )}
           </View>
         </Card>
@@ -189,18 +229,21 @@ export default function ScheduleDetailScreen() {
         {!slots || slots.length === 0 ? (
           <EmptyState
             title="Nenhum slot disponível"
-            message={isAdmin ? 
-              "Adicione slots para que os membros possam se inscrever." :
-              "Esta escala ainda não possui slots disponíveis."
+            message={
+              isAdmin
+                ? 'Adicione slots para que os membros possam se inscrever.'
+                : 'Esta escala ainda não possui slots disponíveis.'
             }
             icon="clock"
-            action={isAdmin ? (
-              <Button
-                onPress={() => router.push(`/schedules/${scheduleId}/manage`)}
-                title="Adicionar Slots"
-                variant="primary"
-              />
-            ) : undefined}
+            action={
+              isAdmin ? (
+                <Button
+                  onPress={() => router.push(`/schedules/${scheduleId}/manage`)}
+                  title="Adicionar Slots"
+                  variant="primary"
+                />
+              ) : undefined
+            }
           />
         ) : (
           <FlatList

@@ -1,4 +1,4 @@
-import { Database } from '@/lib/supabase';
+import { Database } from '@/src/lib/supabase';
 
 export type Schedule = Database['public']['Tables']['schedules']['Row'];
 export type ScheduleInsert = Database['public']['Tables']['schedules']['Insert'];

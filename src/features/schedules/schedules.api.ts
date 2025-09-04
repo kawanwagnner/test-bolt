@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/src/lib/supabase';
 import { ScheduleInsert, ScheduleUpdate, ScheduleWithCreator } from './schedules.types';
 
 export function useSchedules() {

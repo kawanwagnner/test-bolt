@@ -7,12 +7,12 @@ import {
   SafeAreaView,
   RefreshControl,
 } from 'react-native';
-import { useMyAssignments } from '@/features/assignments/assignments.api';
-import { useAuth } from '@/features/auth/useAuth';
-import { Card } from '@/components/Card';
-import { EmptyState } from '@/components/EmptyState';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { getRelativeDate, formatTime } from '@/utils/dates';
+import { useMyAssignments } from '@/src/features/assignments/assignments.api';
+import { useAuth } from '@/src/features/auth/useAuth';
+import { Card } from '@/src/components/Card';
+import { EmptyState } from '@/src/components/EmptyState';
+import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { getRelativeDate, formatTime } from '@/src/utils/dates';
 import { Calendar, Clock } from 'lucide-react-native';
 
 export default function HomeScreen() {

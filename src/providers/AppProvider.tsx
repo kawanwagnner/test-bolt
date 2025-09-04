@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { requestNotificationPermissions, setupNotificationChannel } from '@/lib/notifications';
+import {
+  requestNotificationPermissions,
+  setupNotificationChannel,
+} from '@/src/lib/notifications';
 
 // Create a client with offline persistence
 const queryClient = new QueryClient({
@@ -30,8 +33,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 }

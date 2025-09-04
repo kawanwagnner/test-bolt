@@ -9,13 +9,13 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSchedules } from '@/features/schedules/schedules.api';
-import { useAuth } from '@/features/auth/useAuth';
-import { Card } from '@/components/Card';
-import { Button } from '@/components/Button';
-import { EmptyState } from '@/components/EmptyState';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { getRelativeDate } from '@/utils/dates';
+import { useSchedules } from '@/src/features/schedules/schedules.api';
+import { useAuth } from '@/src/features/auth/useAuth';
+import { Card } from '@/src/components/Card';
+import { Button } from '@/src/components/Button';
+import { EmptyState } from '@/src/components/EmptyState';
+import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { getRelativeDate } from '@/src/utils/dates';
 import { Plus, Calendar, User } from 'lucide-react-native';
 
 export default function SchedulesScreen() {
@@ -35,9 +35,7 @@ export default function SchedulesScreen() {
       <Card variant="elevated">
         <View style={styles.scheduleHeader}>
           <Text style={styles.scheduleTitle}>{item.title}</Text>
-          <Text style={styles.relativeDate}>
-            {getRelativeDate(item.date)}
-          </Text>
+          <Text style={styles.relativeDate}>{getRelativeDate(item.date)}</Text>
         </View>
 
         {item.description && (
@@ -47,9 +45,7 @@ export default function SchedulesScreen() {
         <View style={styles.scheduleInfo}>
           <View style={styles.infoItem}>
             <Calendar size={16} color="#6B7280" />
-            <Text style={styles.infoText}>
-              {getRelativeDate(item.date)}
-            </Text>
+            <Text style={styles.infoText}>{getRelativeDate(item.date)}</Text>
           </View>
 
           {item.created_by_profile?.full_name && (
@@ -91,18 +87,21 @@ export default function SchedulesScreen() {
       {!schedules || schedules.length === 0 ? (
         <EmptyState
           title="Nenhuma escala criada"
-          message={isAdmin ? 
-            "Comece criando sua primeira escala para organizar as atividades." :
-            "Ainda não há escalas disponíveis. Aguarde a criação pelo administrador."
+          message={
+            isAdmin
+              ? 'Comece criando sua primeira escala para organizar as atividades.'
+              : 'Ainda não há escalas disponíveis. Aguarde a criação pelo administrador.'
           }
           icon="calendar"
-          action={isAdmin ? (
-            <Button
-              onPress={() => router.push('/schedules/create')}
-              title="Criar primeira escala"
-              variant="primary"
-            />
-          ) : undefined}
+          action={
+            isAdmin ? (
+              <Button
+                onPress={() => router.push('/schedules/create')}
+                title="Criar primeira escala"
+                variant="primary"
+              />
+            ) : undefined
+          }
         />
       ) : (
         <FlatList

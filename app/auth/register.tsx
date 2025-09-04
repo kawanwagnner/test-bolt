@@ -12,11 +12,11 @@ import {
 import { Link, useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/features/auth/useAuth';
-import { Input } from '@/components/Input';
-import { Button } from '@/components/Button';
-import { Card } from '@/components/Card';
-import { registerSchema, RegisterInput } from '@/utils/validation';
+import { useAuth } from '@/src/features/auth/useAuth';
+import { Input } from '@/src/components/Input';
+import { Button } from '@/src/components/Button';
+import { Card } from '@/src/components/Card';
+import { registerSchema, RegisterInput } from '@/src/utils/validation';
 import { UserPlus } from 'lucide-react-native';
 
 export default function RegisterScreen() {
@@ -50,11 +50,14 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.content}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.header}>
             <View style={styles.iconContainer}>
               <UserPlus size={32} color="#3B82F6" strokeWidth={2} />
@@ -135,7 +138,8 @@ export default function RegisterScreen() {
             />
 
             <Text style={styles.adminHint}>
-              💡 Para criar uma conta de administrador, use um email terminado em @admin.test
+              💡 Para criar uma conta de administrador, use um email terminado
+              em @admin.test
             </Text>
 
             <Button

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { storage } from '@/lib/storage';
+import { supabase } from '@/src/lib/supabase';
+import { storage } from '@/src/lib/storage';
 import { AuthUser, Profile } from './auth.types';
 import type { Session } from '@supabase/supabase-js';
 

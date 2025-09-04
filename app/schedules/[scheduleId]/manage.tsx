@@ -10,29 +10,46 @@ import {
   Modal,
   ScrollView,
   Switch,
+  RefreshControl,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useScheduleById } from '@/features/schedules/schedules.api';
-import { useSlotsBySchedule, useCreateSlot, useUpdateSlot, useDeleteSlot } from '@/features/slots/slots.api';
-import { useThemes } from '@/features/themes/themes.api';
-import { Input } from '@/components/Input';
-import { Button } from '@/components/Button';
-import { Card } from '@/components/Card';
-import { EmptyState } from '@/components/EmptyState';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { slotSchema, SlotInput } from '@/utils/validation';
-import { ArrowLeft, Plus, CreditCard as Edit3, Trash2, Clock, Users, Settings } from 'lucide-react-native';
+import { useScheduleById } from '@/src/features/schedules/schedules.api';
+import {
+  useSlotsBySchedule,
+  useCreateSlot,
+  useUpdateSlot,
+  useDeleteSlot,
+} from '@/src/features/slots/slots.api';
+import { useThemes } from '@/src/features/themes/themes.api';
+import { Input } from '@/src/components/Input';
+import { Button } from '@/src/components/Button';
+import { Card } from '@/src/components/Card';
+import { EmptyState } from '@/src/components/EmptyState';
+import { LoadingSpinner } from '@/src/components/LoadingSpinner';
+import { slotSchema, SlotInput } from '@/src/utils/validation';
+import {
+  ArrowLeft,
+  Plus,
+  CreditCard as Edit3,
+  Trash2,
+  Clock,
+  Users,
+  Settings,
+} from 'lucide-react-native';
 
 export default function ManageScheduleScreen() {
   const router = useRouter();
-  const { scheduleId, slotId } = useLocalSearchParams<{ scheduleId: string; slotId?: string }>();
-  
+  const { scheduleId, slotId } = useLocalSearchParams<{
+    scheduleId: string;
+    slotId?: string;
+  }>();
+
   const { data: schedule } = useScheduleById(scheduleId!);
   const { data: slots, isLoading, refetch } = useSlotsBySchedule(scheduleId!);
   const { data: themes } = useThemes();
-  
+
   const createSlot = useCreateSlot();
   const updateSlot = useUpdateSlot();
   const deleteSlot = useDeleteSlot();
@@ -46,6 +63,7 @@ export default function ManageScheduleScreen() {
     formState: { errors },
     reset,
   } = useForm<SlotInput>({
+    // @ts-ignore
     resolver: zodResolver(slotSchema),
     defaultValues: {
       mode: 'livre',
@@ -89,8 +107,12 @@ export default function ManageScheduleScreen() {
       const slotData = {
         ...data,
         schedule_id: scheduleId!,
-        start_time: data.start_time ? `${schedule?.date}T${data.start_time}:00` : null,
-        end_time: data.end_time ? `${schedule?.date}T${data.end_time}:00` : null,
+        start_time: data.start_time
+          ? `${schedule?.date}T${data.start_time}:00`
+          : null,
+        end_time: data.end_time
+          ? `${schedule?.date}T${data.end_time}:00`
+          : null,
         theme_id: data.theme_id || null,
       };
 
@@ -101,7 +123,7 @@ export default function ManageScheduleScreen() {
         await createSlot.mutateAsync(slotData);
         Alert.alert('Sucesso!', 'Slot criado com sucesso.');
       }
-      
+
       closeModal();
     } catch (error: any) {
       Alert.alert('Erro', error.message || 'Operação não realizada');
@@ -114,7 +136,7 @@ export default function ManageScheduleScreen() {
       `Tem certeza que deseja excluir o slot "${slot.title}"? Esta ação não pode ser desfeita.`,
       [
         { text: 'Cancelar', style: 'cancel' },
-        { 
+        {
           text: 'Excluir',
           style: 'destructive',
           onPress: async () => {
@@ -124,7 +146,7 @@ export default function ManageScheduleScreen() {
             } catch (error: any) {
               Alert.alert('Erro', error.message || 'Não foi possível excluir');
             }
-          }
+          },
         },
       ]
     );
@@ -162,10 +184,12 @@ export default function ManageScheduleScreen() {
         <View style={styles.detailRow}>
           <Clock size={16} color="#6B7280" />
           <Text style={styles.detailText}>
-            {item.start_time && item.end_time ? 
-              `${item.start_time.slice(11, 16)} - ${item.end_time.slice(11, 16)}` :
-              'Horário não definido'
-            }
+            {item.start_time && item.end_time
+              ? `${item.start_time.slice(11, 16)} - ${item.end_time.slice(
+                  11,
+                  16
+                )}`
+              : 'Horário não definido'}
           </Text>
         </View>
 
@@ -177,9 +201,14 @@ export default function ManageScheduleScreen() {
         </View>
 
         <View style={styles.modeIndicator}>
-          <Text style={[styles.modeText, { 
-            color: item.mode === 'manual' ? '#F59E0B' : '#10B981' 
-          }]}>
+          <Text
+            style={[
+              styles.modeText,
+              {
+                color: item.mode === 'manual' ? '#F59E0B' : '#10B981',
+              },
+            ]}
+          >
             {item.mode === 'manual' ? 'Modo Manual' : 'Inscrição Livre'}
           </Text>
         </View>
@@ -201,16 +230,16 @@ export default function ManageScheduleScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <ArrowLeft size={24} color="#374151" strokeWidth={2} />
         </TouchableOpacity>
         <Text style={styles.title} numberOfLines={1}>
           Gerenciar Slots
         </Text>
-        <TouchableOpacity
-          onPress={() => openModal()}
-          style={styles.addButton}
-        >
+        <TouchableOpacity onPress={() => openModal()} style={styles.addButton}>
           <Plus size={24} color="#FFFFFF" strokeWidth={2} />
         </TouchableOpacity>
       </View>
@@ -260,7 +289,10 @@ export default function ManageScheduleScreen() {
             <View style={styles.placeholder} />
           </View>
 
-          <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.modalContent}
+            showsVerticalScrollIndicator={false}
+          >
             <Card variant="elevated">
               <View style={styles.formHeader}>
                 <Settings size={24} color="#3B82F6" strokeWidth={2} />
@@ -360,12 +392,16 @@ export default function ManageScheduleScreen() {
                     <View style={styles.switchInfo}>
                       <Text style={styles.switchLabel}>Modo de Inscrição</Text>
                       <Text style={styles.switchDescription}>
-                        {value === 'livre' ? 'Inscrição livre (automática)' : 'Atribuição manual (admin)'}
+                        {value === 'livre'
+                          ? 'Inscrição livre (automática)'
+                          : 'Atribuição manual (admin)'}
                       </Text>
                     </View>
                     <Switch
                       value={value === 'manual'}
-                      onValueChange={(isManual) => onChange(isManual ? 'manual' : 'livre')}
+                      onValueChange={(isManual) =>
+                        onChange(isManual ? 'manual' : 'livre')
+                      }
                       trackColor={{ false: '#10B981', true: '#F59E0B' }}
                       thumbColor={value === 'manual' ? '#FFFFFF' : '#FFFFFF'}
                     />
@@ -382,6 +418,7 @@ export default function ManageScheduleScreen() {
                 size="large"
               />
               <Button
+                // @ts-ignore
                 onPress={handleSubmit(onSubmit)}
                 title={editingSlot ? 'Salvar' : 'Criar'}
                 size="large"

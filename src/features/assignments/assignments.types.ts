@@ -1,4 +1,4 @@
-import { Database } from '@/lib/supabase';
+import { Database } from '@/src/lib/supabase';
 
 export type Assignment = Database['public']['Tables']['assignments']['Row'];
 export type AssignmentInsert = Database['public']['Tables']['assignments']['Insert'];

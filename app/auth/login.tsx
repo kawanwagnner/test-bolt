@@ -11,11 +11,11 @@ import {
 import { Link, useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/features/auth/useAuth';
-import { Input } from '@/components/Input';
-import { Button } from '@/components/Button';
-import { Card } from '@/components/Card';
-import { loginSchema, LoginInput } from '@/utils/validation';
+import { useAuth } from '@/src/features/auth/useAuth';
+import { Input } from '@/src/components/Input';
+import { Button } from '@/src/components/Button';
+import { Card } from '@/src/components/Card';
+import { loginSchema, LoginInput } from '@/src/utils/validation';
 import { LogIn } from 'lucide-react-native';
 
 export default function LoginScreen() {
@@ -34,10 +34,19 @@ export default function LoginScreen() {
   const onSubmit = async (data: LoginInput) => {
     setLoading(true);
     try {
+      console.log('Tentando login com:', data.email);
       await signIn(data.email, data.password);
+      console.log('Login bem-sucedido, redirecionando...');
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Erro no Login', error.message || 'Verifique suas credenciais');
+      console.error('Erro no login:', error);
+      let msg = 'Verifique suas credenciais';
+      if (error?.message) {
+        msg = error.message;
+      } else if (typeof error === 'string') {
+        msg = error;
+      }
+      Alert.alert('Erro no Login', msg);
     } finally {
       setLoading(false);
     }
@@ -45,7 +54,7 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.content}
       >

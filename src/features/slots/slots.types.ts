@@ -1,4 +1,4 @@
-import { Database } from '@/lib/supabase';
+import { Database } from '@/src/lib/supabase';
 
 export type Slot = Database['public']['Tables']['slots']['Row'];
 export type SlotInsert = Database['public']['Tables']['slots']['Insert'];

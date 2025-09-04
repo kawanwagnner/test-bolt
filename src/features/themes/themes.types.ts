@@ -1,4 +1,4 @@
-import { Database } from '@/lib/supabase';
+import { Database } from '@/src/lib/supabase';
 
 export type Theme = Database['public']['Tables']['themes']['Row'];
 export type ThemeInsert = Database['public']['Tables']['themes']['Insert'];

@@ -1,15 +1,9 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-} from 'react-native';
-import { useAuth } from '@/features/auth/useAuth.ts';
-import { Card } from '@/components/Card';
-import { Button } from '@/components/Button';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { View, Text, StyleSheet, SafeAreaView, Alert } from 'react-native';
+import { useAuth } from '@/src/features/auth/useAuth';
+import { Card } from '@/src/components/Card';
+import { Button } from '@/src/components/Button';
+import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { User, Shield, BookOpen, LogOut, Mail } from 'lucide-react-native';
 
 export default function ProfileScreen() {
@@ -73,8 +67,16 @@ export default function ProfileScreen() {
                 {user.profile?.full_name || 'Usuário'}
               </Text>
               <View style={styles.roleContainer}>
-                <Shield size={16} color={getRoleColor(user.profile?.role || 'member')} />
-                <Text style={[styles.roleText, { color: getRoleColor(user.profile?.role || 'member') }]}>
+                <Shield
+                  size={16}
+                  color={getRoleColor(user.profile?.role || 'member')}
+                />
+                <Text
+                  style={[
+                    styles.roleText,
+                    { color: getRoleColor(user.profile?.role || 'member') },
+                  ]}
+                >
                   {getRoleText(user.profile?.role || 'member')}
                 </Text>
               </View>
@@ -101,7 +103,8 @@ export default function ProfileScreen() {
         <Card variant="outlined" style={styles.infoCard}>
           <Text style={styles.infoTitle}>Sobre o App</Text>
           <Text style={styles.infoText}>
-            O EscalasApp permite gerenciar escalas dinâmicas com temas e tarefas organizadas por dia.
+            O EscalasApp permite gerenciar escalas dinâmicas com temas e tarefas
+            organizadas por dia.
           </Text>
           <Text style={styles.infoText}>
             • Receba lembretes automáticos 24h antes
@@ -109,9 +112,7 @@ export default function ProfileScreen() {
           <Text style={styles.infoText}>
             • Professores recebem lembretes adicionais 48h antes
           </Text>
-          <Text style={styles.infoText}>
-            • Atualizações em tempo real
-          </Text>
+          <Text style={styles.infoText}>• Atualizações em tempo real</Text>
         </Card>
       </View>
 

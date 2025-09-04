@@ -13,11 +13,11 @@ import {
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCreateSchedule } from '@/features/schedules/schedules.api';
-import { Input } from '@/components/Input';
-import { Button } from '@/components/Button';
-import { Card } from '@/components/Card';
-import { scheduleSchema, ScheduleInput } from '@/utils/validation';
+import { useCreateSchedule } from '@/src/features/schedules/schedules.api';
+import { Input } from '@/src/components/Input';
+import { Button } from '@/src/components/Button';
+import { Card } from '@/src/components/Card';
+import { scheduleSchema, ScheduleInput } from '@/src/utils/validation';
 import { Calendar, ArrowLeft, Bell, Clock } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 
@@ -30,8 +30,12 @@ export default function CreateScheduleScreen() {
     handleSubmit,
     formState: { errors },
   } = useForm<ScheduleInput>({
+    // @ts-ignore
     resolver: zodResolver(scheduleSchema),
     defaultValues: {
+      title: '',
+      date: '',
+      description: '',
       notify_24h: true,
       notify_48h: false,
     },
@@ -43,11 +47,9 @@ export default function CreateScheduleScreen() {
         ...data,
         created_by: undefined, // Will be set by RLS
       });
-      Alert.alert(
-        'Sucesso!',
-        'Escala criada com sucesso.',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+      Alert.alert('Sucesso!', 'Escala criada com sucesso.', [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
     } catch (error: any) {
       Alert.alert('Erro', error.message || 'Não foi possível criar a escala');
     }
@@ -56,18 +58,24 @@ export default function CreateScheduleScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <ArrowLeft size={24} color="#374151" strokeWidth={2} />
         </TouchableOpacity>
         <Text style={styles.title}>Nova Escala</Text>
         <View style={styles.placeholder} />
       </View>
 
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.content}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <Card variant="elevated">
             <View style={styles.formHeader}>
               <Calendar size={24} color="#3B82F6" strokeWidth={2} />
@@ -157,7 +165,9 @@ export default function CreateScheduleScreen() {
               render={({ field: { value, onChange } }) => (
                 <View style={styles.switchContainer}>
                   <View style={styles.switchInfo}>
-                    <Text style={styles.switchLabel}>Lembrete 48h antes (Professores)</Text>
+                    <Text style={styles.switchLabel}>
+                      Lembrete 48h antes (Professores)
+                    </Text>
                     <Text style={styles.switchDescription}>
                       Notificar professores com 48 horas de antecedência
                     </Text>
@@ -181,7 +191,9 @@ export default function CreateScheduleScreen() {
               size="large"
             />
             <Button
-              onPress={handleSubmit(onSubmit)}
+              onPress={handleSubmit((data) =>
+                onSubmit(data as unknown as ScheduleInput)
+              )}
               title="Criar Escala"
               size="large"
               loading={createScheduleMutation.isPending}

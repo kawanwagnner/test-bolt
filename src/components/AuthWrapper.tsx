@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useRouter, useSegments } from 'expo-router';
-import { useAuth } from '@/features/auth/useAuth';
+import { useAuth } from '@/src/features/auth/useAuth';
 import { LoadingSpinner } from './LoadingSpinner';
 
 export function AuthWrapper({ children }: { children: React.ReactNode }) {

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Clock, Users, User } from 'lucide-react-native';
-import { SlotWithDetails } from '@/features/slots/slots.types';
-import { formatTime } from '@/utils/dates';
+import { SlotWithDetails } from '@/src/features/slots/slots.types';
+import { formatTime } from '@/src/utils/dates';
 import { Button } from './Button';
 
 interface SlotItemProps {
@@ -36,7 +36,12 @@ export function SlotItem({
       <View style={styles.header}>
         <Text style={styles.title}>{slot.title || 'Slot sem título'}</Text>
         <View style={styles.modeIndicator}>
-          <Text style={[styles.modeText, { color: isManualMode ? '#F59E0B' : '#10B981' }]}>
+          <Text
+            style={[
+              styles.modeText,
+              { color: isManualMode ? '#F59E0B' : '#10B981' },
+            ]}
+          >
             {isManualMode ? 'Manual' : 'Livre'}
           </Text>
         </View>
@@ -46,9 +51,7 @@ export function SlotItem({
         <Text style={styles.description}>{slot.description}</Text>
       )}
 
-      {slot.theme && (
-        <Text style={styles.theme}>Tema: {slot.theme.name}</Text>
-      )}
+      {slot.theme && <Text style={styles.theme}>Tema: {slot.theme.name}</Text>}
 
       <View style={styles.details}>
         {slot.start_time && slot.end_time && (
