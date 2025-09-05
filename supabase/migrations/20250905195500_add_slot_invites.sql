@@ -41,7 +41,9 @@ create policy "slot_invites_manage_admin" on slot_invites
       )
     )
     or created_by = auth.uid()
-  ) with check (true);
+  ) with check (
+    true
+  );
 
 -- Usuário convidado pode ver seu convite
 create policy "slot_invites_view_invited" on slot_invites

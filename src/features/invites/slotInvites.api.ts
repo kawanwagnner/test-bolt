@@ -37,9 +37,10 @@ export function useCreateSlotInvite() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ slot_id, email }: CreateSlotInviteInput) => {
+      const { data: { user } } = await supabase.auth.getUser();
       const { data, error } = await supabase
         .from('slot_invites')
-        .insert({ slot_id, email })
+        .insert({ slot_id, email, created_by: user?.id })
         .select('*')
         .single();
       if (error) throw error;
@@ -73,6 +74,53 @@ export function useRespondSlotInvite() {
       return data as SlotInvite;
     },
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['slot-invites:me'] });
+      qc.invalidateQueries({ queryKey: ['slots'] });
+    },
+  });
+}
+
+export function useDeleteSlotInvite() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (invite_id: string) => {
+      const { data, error } = await supabase
+        .from('slot_invites')
+        .delete()
+        .eq('id', invite_id)
+        .select('id, slot_id');
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error('Convite não encontrado ou sem permissão para excluir.');
+      }
+      return data[0] as { id: string; slot_id: string };
+    },
+    onMutate: async (invite_id: string) => {
+      // optimistic update on specific slot list
+      const keys = qc.getQueryCache().findAll({ queryKey: ['slot-invites'] });
+      const previous: any[] = [];
+      for (const k of keys) {
+        const key = k.queryKey as any[];
+        if (key.length === 2) {
+          const slotId = key[1];
+          const data = qc.getQueryData<SlotInvite[]>(key);
+            if (data) {
+              previous.push({ key, data });
+              qc.setQueryData<SlotInvite[]>(key, data.filter(i => i.id !== invite_id));
+            }
+        }
+      }
+      return { previous };
+    },
+    onError: (err, _id, ctx) => {
+      if (ctx?.previous) {
+        for (const p of ctx.previous) qc.setQueryData(p.key, p.data);
+      }
+      // simples log; poderia trocar por toast
+  console.error('Falha ao deletar convite', err);
+    },
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: ['slot-invites', data.slot_id] });
       qc.invalidateQueries({ queryKey: ['slot-invites:me'] });
       qc.invalidateQueries({ queryKey: ['slots'] });
     },
