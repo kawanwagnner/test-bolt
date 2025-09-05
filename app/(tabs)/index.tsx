@@ -46,9 +46,9 @@ export default function HomeScreen() {
     <Card variant="elevated">
       <View style={styles.assignmentHeader}>
         <Text style={styles.scheduleTitle}>{item.slot.schedule.title}</Text>
-        <Text style={styles.relativeDate}>
-          {getRelativeDate(item.slot.schedule.date)}
-        </Text>
+        <View style={styles.statusBadge}>
+          <Text style={styles.statusText}>Inscrito</Text>
+        </View>
       </View>
 
       <Text style={styles.slotTitle}>{item.slot.title}</Text>
@@ -142,6 +142,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#3B82F6',
+  },
+  statusBadge: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 9999,
+  },
+  statusText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   slotTitle: {
     fontSize: 18,

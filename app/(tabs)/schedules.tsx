@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statusBadge: {
-    backgroundColor: '#D1FAE5',
+    backgroundColor: '#d1ecfa',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
