@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Calendar, User, BookOpen, HomeIcon } from 'lucide-react-native';
+import { Calendar, User, BookOpen, HomeIcon, Users } from 'lucide-react-native';
 import { useAuth } from '@/src/features/auth/useAuth';
 import { useMemo } from 'react';
 
@@ -66,6 +66,15 @@ export default function TabLayout() {
           title: 'Eventos',
           tabBarIcon: ({ size, color }) => (
             <BookOpen size={size} color={color} strokeWidth={2} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="invites"
+        options={{
+          title: 'Convites',
+          tabBarIcon: ({ size, color }) => (
+            <Users size={size} color={color} strokeWidth={2} />
           ),
         }}
       />

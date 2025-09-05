@@ -31,6 +31,7 @@ import { Card } from '@/src/components/Card';
 import { EmptyState } from '@/src/components/EmptyState';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
 import { slotSchema, SlotInput } from '@/src/utils/validation';
+import { SlotManualInvites } from '@/src/components/SlotManualInvites';
 import {
   ArrowLeft,
   Plus,
@@ -39,7 +40,6 @@ import {
   Clock,
   Users,
   Settings,
-  Calendar,
 } from 'lucide-react-native';
 
 export default function ManageScheduleScreen() {
@@ -51,7 +51,6 @@ export default function ManageScheduleScreen() {
 
   const { data: schedule } = useScheduleById(scheduleId!);
   const { data: slots, isLoading, refetch } = useSlotsBySchedule(scheduleId!);
-  const { data: themes } = useThemes();
 
   const createSlot = useCreateSlot();
   const updateSlot = useUpdateSlot();
@@ -65,6 +64,7 @@ export default function ManageScheduleScreen() {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<SlotInput>({
     // @ts-ignore
     resolver: zodResolver(slotSchema),
@@ -104,6 +104,8 @@ export default function ManageScheduleScreen() {
     }
     setModalVisible(true);
   };
+
+  const modeWatch = watch('mode');
 
   const closeModal = () => {
     setModalVisible(false);
@@ -231,6 +233,8 @@ export default function ManageScheduleScreen() {
           ))}
         </View>
       )}
+
+      {item.mode === 'manual' && <SlotManualInvites slotId={item.id} />}
     </Card>
   );
 
@@ -423,7 +427,7 @@ export default function ManageScheduleScreen() {
                       <Text style={styles.switchDescription}>
                         {value === 'livre'
                           ? 'Inscrição livre (automática)'
-                          : 'Atribuição manual (admin)'}
+                          : 'Inscrição manual (admin escolhe quem participa)'}
                       </Text>
                     </View>
                     <Switch
@@ -437,6 +441,17 @@ export default function ManageScheduleScreen() {
                   </View>
                 )}
               />
+
+              {editingSlot?.id && modeWatch === 'manual' && (
+                <View style={{ marginTop: 4 }}>
+                  <SlotManualInvites slotId={editingSlot.id} />
+                </View>
+              )}
+              {!editingSlot && modeWatch === 'manual' && (
+                <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
+                  Salve o slot primeiro para então adicionar convites manuais.
+                </Text>
+              )}
             </Card>
 
             <View style={styles.modalActions}>

@@ -172,6 +172,41 @@ export type Database = {
           created_at?: string;
         };
       };
+      slot_invites: {
+        Row: {
+          id: string;
+          slot_id: string;
+          email: string;
+          status: 'pending' | 'accepted' | 'declined';
+          token: string;
+          created_by: string | null;
+          accepted_by: string | null;
+          created_at: string;
+          accepted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          slot_id: string;
+          email: string;
+          status?: 'pending' | 'accepted' | 'declined';
+          token?: string;
+          created_by?: string | null;
+          accepted_by?: string | null;
+          created_at?: string;
+          accepted_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          slot_id?: string;
+          email?: string;
+          status?: 'pending' | 'accepted' | 'declined';
+          token?: string;
+          created_by?: string | null;
+          accepted_by?: string | null;
+          created_at?: string;
+          accepted_at?: string | null;
+        };
+      };
     };
   };
 };
