@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -18,14 +18,14 @@ import { Input } from '@/src/components/Input';
 import { Button } from '@/src/components/Button';
 import { Card } from '@/src/components/Card';
 import { scheduleSchema, ScheduleInput } from '@/src/utils/validation';
-import { Calendar, ArrowLeft, Bell, Clock } from 'lucide-react-native';
+import { Calendar, ArrowLeft, Bell } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { format } from 'date-fns';
 
 export default function CreateScheduleScreen() {
   const router = useRouter();
   const createScheduleMutation = useCreateSchedule();
+
+  const today = new Date().toISOString().slice(0, 10);
 
   const {
     control,
@@ -36,10 +36,11 @@ export default function CreateScheduleScreen() {
     resolver: zodResolver(scheduleSchema),
     defaultValues: {
       title: '',
-      date: '',
+      date: today, // atribui automaticamente
       description: '',
       notify_24h: true,
-      notify_48h: false,
+      notify_48h: true,
+      notify_48h_musician: true,
     },
   });
 
@@ -57,9 +58,7 @@ export default function CreateScheduleScreen() {
     }
   };
 
-  // Date picker state
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [dateObj, setDateObj] = useState<Date | null>(null);
+  // Campo de data removido da UI; valor atribuído automaticamente.
 
   return (
     <SafeAreaView style={styles.container}>
@@ -121,44 +120,7 @@ export default function CreateScheduleScreen() {
               )}
             />
 
-            <Controller
-              control={control}
-              name="date"
-              render={({ field: { onChange, value } }) => (
-                <>
-                  <Text style={{ fontWeight: '600', marginBottom: 4 }}>
-                    Data
-                  </Text>
-                  <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-                    <View pointerEvents="none">
-                      <Input
-                        placeholder="Selecione a data"
-                        value={dateObj ? format(dateObj, 'dd/MM/yyyy') : ''}
-                        editable={false}
-                        error={errors.date?.message}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                  <DateTimePickerModal
-                    isVisible={showDatePicker}
-                    mode="date"
-                    onConfirm={(date) => {
-                      setDateObj(date);
-                      setShowDatePicker(false);
-                      onChange(format(date, 'yyyy-MM-dd'));
-                    }}
-                    onCancel={() => setShowDatePicker(false)}
-                    locale="pt-BR"
-                    minimumDate={new Date()}
-                  />
-                  {errors.date?.message ? (
-                    <Text style={{ color: '#EF4444', fontSize: 12 }}>
-                      {errors.date.message}
-                    </Text>
-                  ) : null}
-                </>
-              )}
-            />
+            {/* Data agora automática (data de hoje). Campo oculto. */}
           </Card>
 
           <Card variant="elevated">
@@ -199,6 +161,29 @@ export default function CreateScheduleScreen() {
                     </Text>
                     <Text style={styles.switchDescription}>
                       Notificar professores com 48 horas de antecedência
+                    </Text>
+                  </View>
+                  <Switch
+                    value={value}
+                    onValueChange={onChange}
+                    trackColor={{ false: '#E5E7EB', true: '#93C5FD' }}
+                    thumbColor={value ? '#3B82F6' : '#9CA3AF'}
+                  />
+                </View>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="notify_48h_musician"
+              render={({ field: { value, onChange } }) => (
+                <View style={styles.switchContainer}>
+                  <View style={styles.switchInfo}>
+                    <Text style={styles.switchLabel}>
+                      Lembrete 48h antes (Músicos)
+                    </Text>
+                    <Text style={styles.switchDescription}>
+                      Notificar músicos com 48 horas de antecedência
                     </Text>
                   </View>
                   <Switch

@@ -20,7 +20,8 @@ export const scheduleSchema = z.object({
   description: z.string().optional(),
   date: z.string().min(1, 'Data é obrigatória'),
   notify_24h: z.boolean().default(true),
-  notify_48h: z.boolean().default(false),
+  notify_48h: z.boolean().default(true), // professores
+  notify_48h_musician: z.boolean().default(true), // músicos
 });
 
 export const slotSchema = z

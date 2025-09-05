@@ -48,7 +48,6 @@ export default function EventsAgendaScreen() {
   const loadEvents = async () => {
     try {
       const allEvents = await fetchPublicEvents();
-      console.log('Eventos carregados:', allEvents.length, allEvents);
       setEvents(allEvents);
       // Agrupa eventos por data
       const grouped: Record<string, PublicEvent[]> = {};

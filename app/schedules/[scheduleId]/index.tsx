@@ -73,7 +73,8 @@ export default function ScheduleDetailScreen() {
       date: '',
       description: '',
       notify_24h: true,
-      notify_48h: false,
+      notify_48h: true,
+      notify_48h_musician: true,
     },
   });
 
@@ -85,6 +86,7 @@ export default function ScheduleDetailScreen() {
         description: schedule.description || '',
         notify_24h: schedule.notify_24h,
         notify_48h: schedule.notify_48h,
+        notify_48h_musician: (schedule as any).notify_48h_musician,
       });
       setDateObj(schedule.date ? new Date(schedule.date) : null);
       setEditModalVisible(true);
@@ -441,6 +443,29 @@ export default function ScheduleDetailScreen() {
                     </View>
                   )}
                 />
+                <Controller
+                  control={control}
+                  name="notify_48h_musician"
+                  render={({ field: { value, onChange } }) => (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginBottom: 12,
+                      }}
+                    >
+                      <Text style={{ flex: 1 }}>
+                        Lembrete 48h antes (Músicos)
+                      </Text>
+                      <Switch
+                        value={value}
+                        onValueChange={onChange}
+                        trackColor={{ false: '#E5E7EB', true: '#93C5FD' }}
+                        thumbColor={value ? '#3B82F6' : '#9CA3AF'}
+                      />
+                    </View>
+                  )}
+                />
                 <View
                   style={{
                     flexDirection: 'row',
@@ -492,6 +517,11 @@ export default function ScheduleDetailScreen() {
             {schedule.notify_48h && (
               <Text style={styles.notificationText}>
                 • Lembrete 48h (Professores)
+              </Text>
+            )}
+            {(schedule as any).notify_48h_musician && (
+              <Text style={styles.notificationText}>
+                • Lembrete 48h (Músicos)
               </Text>
             )}
           </View>

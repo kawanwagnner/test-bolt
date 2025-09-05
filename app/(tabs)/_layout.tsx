@@ -45,7 +45,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="schedules"
         options={{
-          title: 'Escalas',
+          title: 'Grupos',
           tabBarIcon: ({ size, color }) => (
             <Calendar size={size} color={color} strokeWidth={2} />
           ),

@@ -54,7 +54,8 @@ export type Database = {
           description: string | null;
           date: string;
           notify_24h: boolean;
-          notify_48h: boolean;
+          notify_48h: boolean; // professores
+          notify_48h_musician: boolean; // músicos
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -66,6 +67,7 @@ export type Database = {
           date: string;
           notify_24h?: boolean;
           notify_48h?: boolean;
+          notify_48h_musician?: boolean;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -77,6 +79,7 @@ export type Database = {
           date?: string;
           notify_24h?: boolean;
           notify_48h?: boolean;
+          notify_48h_musician?: boolean;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;

@@ -15,7 +15,7 @@ import { Card } from '@/src/components/Card';
 import { Button } from '@/src/components/Button';
 import { EmptyState } from '@/src/components/EmptyState';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
-import { getRelativeDate } from '@/src/utils/dates';
+// Removido status relativo; exibiremos badge estático "Ativo"
 import { Plus, Calendar, User } from 'lucide-react-native';
 
 export default function SchedulesScreen() {
@@ -35,7 +35,9 @@ export default function SchedulesScreen() {
       <Card variant="elevated">
         <View style={styles.scheduleHeader}>
           <Text style={styles.scheduleTitle}>{item.title}</Text>
-          <Text style={styles.relativeDate}>{getRelativeDate(item.date)}</Text>
+          <View style={styles.statusBadge}>
+            <Text style={styles.statusText}>Ativo</Text>
+          </View>
         </View>
 
         {item.description && (
@@ -45,7 +47,9 @@ export default function SchedulesScreen() {
         <View style={styles.scheduleInfo}>
           <View style={styles.infoItem}>
             <Calendar size={16} color="#6B7280" />
-            <Text style={styles.infoText}>{getRelativeDate(item.date)}</Text>
+            <Text style={styles.infoText}>
+              {item.date?.split('-').reverse().join('/')}
+            </Text>
           </View>
 
           {item.created_by_profile?.full_name && (
@@ -64,6 +68,11 @@ export default function SchedulesScreen() {
           )}
           {item.notify_48h && (
             <Text style={styles.notificationText}>• Lembrete 48h</Text>
+          )}
+          {item.notify_48h_musician && (
+            <Text style={styles.notificationText}>
+              • Lembrete 48h (Músicos)
+            </Text>
           )}
         </View>
       </Card>
@@ -171,10 +180,18 @@ const styles = StyleSheet.create({
     color: '#111827',
     flex: 1,
   },
-  relativeDate: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#3B82F6',
+  statusBadge: {
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#065F46',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   description: {
     fontSize: 14,
