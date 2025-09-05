@@ -10,5 +10,17 @@
     "days": ["Saturday", "Sunday"],
     "time": "08:00",
     "action": "showNoEventsMessage"
+  },
+  {
+    "id": "encouragement-musician",
+    "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "time": "10:00",
+    "action": "sendEncouragementMusician"
+  },
+  {
+    "id": "encouragement-teacher",
+    "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "time": "15:00",
+    "action": "sendEncouragementTeacher"
   }
 ]

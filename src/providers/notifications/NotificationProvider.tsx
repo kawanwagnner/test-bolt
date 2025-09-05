@@ -16,6 +16,7 @@ import {
 import { fetchPublicEvents } from '@/src/features/events/publicEvents.api';
 import { format } from 'date-fns';
 import notificationRoutines from './notificationRoutines.json';
+import { useRoutineEncouragement } from './useRoutineEncouragement';
 
 interface NotificationContextProps {
   permissionsGranted: boolean;
@@ -55,6 +56,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   // Funções customizadas para rotinas
+  const { sendEncouragementMusician, sendEncouragementTeacher } =
+    useRoutineEncouragement();
+
   const checkEventsAndNotify = useCallback(async () => {
     try {
       const events = await fetchPublicEvents();
@@ -89,6 +93,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   const routineActions: Record<string, () => Promise<void>> = {
     checkEventsAndNotify,
     showNoEventsMessage,
+    sendEncouragementMusician,
+    sendEncouragementTeacher,
   };
 
   // Agendamento das rotinas

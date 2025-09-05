@@ -24,6 +24,7 @@ export type Database = {
           full_name: string | null;
           role: 'admin' | 'member';
           is_teacher: boolean;
+          is_musician: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -32,6 +33,7 @@ export type Database = {
           full_name?: string | null;
           role?: 'admin' | 'member';
           is_teacher?: boolean;
+          is_musician?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -40,6 +42,7 @@ export type Database = {
           full_name?: string | null;
           role?: 'admin' | 'member';
           is_teacher?: boolean;
+          is_musician?: boolean;
           created_at?: string;
           updated_at?: string;
         };
