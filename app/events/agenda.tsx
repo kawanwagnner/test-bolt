@@ -13,12 +13,13 @@ import {
   TextInput,
   Pressable,
 } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNotification } from '@/src/providers/notifications/NotificationProvider';
 import {
   PublicEvent,
   fetchPublicEvents,
   addPublicEvent,
+  updatePublicEvent,
+  deletePublicEvent,
 } from '@/src/features/events/publicEvents.api';
 import { useAuth } from '@/src/features/auth/useAuth';
 import { Button } from '@/src/components/Button';
@@ -26,6 +27,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { parse } from 'papaparse';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { format } from 'date-fns';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function EventsAgendaScreen() {
   const [events, setEvents] = useState<PublicEvent[]>([]);
@@ -46,6 +48,7 @@ export default function EventsAgendaScreen() {
   const loadEvents = async () => {
     try {
       const allEvents = await fetchPublicEvents();
+      console.log('Eventos carregados:', allEvents.length, allEvents);
       setEvents(allEvents);
       // Agrupa eventos por data
       const grouped: Record<string, PublicEvent[]> = {};
@@ -55,6 +58,7 @@ export default function EventsAgendaScreen() {
       });
       setEventsByDate(grouped);
     } catch (err) {
+      console.log('Erro ao carregar eventos:', err);
       // Pode exibir erro se quiser
     }
   };
@@ -78,7 +82,7 @@ export default function EventsAgendaScreen() {
     }
   }, [selectedDate, eventsByDate]);
 
-  // Marca os dias com eventos
+  // Marca os dias com eventos e garante que o dia selecionado sempre fique marcado
   const markedDates = Object.keys(eventsByDate).reduce((acc, date) => {
     acc[date] = {
       marked: true,
@@ -88,6 +92,13 @@ export default function EventsAgendaScreen() {
     };
     return acc;
   }, {} as Record<string, any>);
+  // Se o dia selecionado não tiver eventos, ainda assim deve ficar marcado
+  if (!markedDates[selectedDate]) {
+    markedDates[selectedDate] = {
+      selected: true,
+      selectedColor: '#3B82F6',
+    };
+  }
 
   // Modal de cadastro de evento
   const [modalVisible, setModalVisible] = useState(false);
@@ -96,6 +107,18 @@ export default function EventsAgendaScreen() {
   const [dateObj, setDateObj] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [newDesc, setNewDesc] = useState('');
+
+  // Modal de edição
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editEvent, setEditEvent] = useState<PublicEvent | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDateObj, setEditDateObj] = useState<Date | null>(null);
+  const [editDesc, setEditDesc] = useState('');
+  const [editShowDatePicker, setEditShowDatePicker] = useState(false);
+
+  // Modal de confirmação de exclusão
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleteEvent, setDeleteEvent] = useState<PublicEvent | null>(null);
 
   const handleAddEvent = () => {
     setModalVisible(true);
@@ -126,6 +149,53 @@ export default function EventsAgendaScreen() {
       await loadEvents();
     } catch (err: any) {
       alert('Erro ao salvar evento: ' + (err?.message || JSON.stringify(err)));
+    }
+  };
+
+  // Funções para editar evento
+  const handleEditEvent = (event: PublicEvent) => {
+    setEditEvent(event);
+    setEditTitle(event.title);
+    setEditDateObj(new Date(event.date));
+    setEditDesc(event.description || '');
+    setEditModalVisible(true);
+  };
+
+  const handleSaveEditEvent = async () => {
+    if (!editEvent || !editTitle || !editDateObj) {
+      alert('Preencha título e data!');
+      return;
+    }
+    try {
+      await updatePublicEvent({
+        id: editEvent.id,
+        title: editTitle,
+        date: format(editDateObj, 'yyyy-MM-dd'),
+        description: editDesc,
+      });
+      setEditModalVisible(false);
+      setEditEvent(null);
+      await loadEvents();
+    } catch (err: any) {
+      alert('Erro ao editar evento: ' + (err?.message || JSON.stringify(err)));
+    }
+  };
+
+  // Funções para deletar evento
+  const handleDeleteEvent = (event: PublicEvent) => {
+    setDeleteEvent(event);
+    setDeleteModalVisible(true);
+  };
+
+  const handleConfirmDeleteEvent = async () => {
+    if (!deleteEvent) return;
+    try {
+      await deletePublicEvent(deleteEvent.id);
+      setDeleteModalVisible(false);
+      setDeleteEvent(null);
+      await loadEvents();
+    } catch (err: any) {
+      alert('Erro ao excluir evento: ' + (err?.message || JSON.stringify(err)));
     }
   };
 
@@ -262,37 +332,147 @@ export default function EventsAgendaScreen() {
             </Text>
             {eventsByDate[selectedDate].map((item) => (
               <View key={item.id} style={styles.card}>
-                <Text style={styles.eventTitle}>{item.title}</Text>
-                <Text style={styles.eventDate}>{item.date}</Text>
-                {item.description ? (
-                  <Text style={styles.eventDesc}>{item.description}</Text>
-                ) : null}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.eventTitle}>{item.title}</Text>
+                    <Text style={styles.eventDate}>{item.date}</Text>
+                    {item.description ? (
+                      <Text style={styles.eventDesc}>{item.description}</Text>
+                    ) : null}
+                  </View>
+                  {isAdmin && (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 8,
+                      }}
+                    >
+                      <Pressable
+                        onPress={() => handleEditEvent(item)}
+                        style={{ marginRight: 12 }}
+                        accessibilityLabel="Editar"
+                      >
+                        <MaterialIcons name="edit" size={22} color="#0284C7" />
+                      </Pressable>
+                      <Pressable
+                        onPress={() => handleDeleteEvent(item)}
+                        accessibilityLabel="Excluir"
+                      >
+                        <MaterialIcons
+                          name="delete"
+                          size={22}
+                          color="#DC2626"
+                        />
+                      </Pressable>
+                    </View>
+                  )}
+                </View>
               </View>
             ))}
           </View>
         ) : (
           <Text style={styles.empty}>Nenhum evento neste dia.</Text>
         )}
-
-        {/* Lista todos os eventos cadastrados */}
-        <View style={{ marginTop: 32 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>
-            Todos os eventos cadastrados:
-          </Text>
-          {events.length === 0 ? (
-            <Text style={styles.empty}>Nenhum evento cadastrado.</Text>
-          ) : (
-            events.map((item) => (
-              <View key={item.id} style={styles.card}>
-                <Text style={styles.eventTitle}>{item.title}</Text>
-                <Text style={styles.eventDate}>{item.date}</Text>
-                {item.description ? (
-                  <Text style={styles.eventDesc}>{item.description}</Text>
-                ) : null}
+        {/* Modal de edição de evento */}
+        <Modal visible={editModalVisible} animationType="slide" transparent>
+          <View style={styles.modalBg}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Editar Evento</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Título"
+                value={editTitle}
+                onChangeText={setEditTitle}
+              />
+              <Pressable onPress={() => setEditShowDatePicker(true)}>
+                <View pointerEvents="none">
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Data do evento (dd/mm/yyyy)"
+                    value={editDateObj ? format(editDateObj, 'dd/MM/yyyy') : ''}
+                    editable={false}
+                  />
+                </View>
+              </Pressable>
+              <DateTimePickerModal
+                isVisible={editShowDatePicker}
+                mode="date"
+                onConfirm={(date) => {
+                  setEditDateObj(date);
+                  setEditShowDatePicker(false);
+                }}
+                onCancel={() => setEditShowDatePicker(false)}
+                locale="pt-BR"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Descrição (opcional)"
+                value={editDesc}
+                onChangeText={setEditDesc}
+              />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginTop: 16,
+                }}
+              >
+                <Button
+                  title="Cancelar"
+                  onPress={() => setEditModalVisible(false)}
+                  size="small"
+                  variant="danger"
+                />
+                <Button
+                  title="Salvar"
+                  onPress={handleSaveEditEvent}
+                  size="small"
+                  variant="primary"
+                />
               </View>
-            ))
-          )}
-        </View>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Modal de confirmação de exclusão */}
+        <Modal visible={deleteModalVisible} animationType="fade" transparent>
+          <View style={styles.modalBg}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Excluir Evento</Text>
+              <Text>
+                Tem certeza que deseja excluir o evento "{deleteEvent?.title}"?
+              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginTop: 16,
+                }}
+              >
+                <Button
+                  title="Cancelar"
+                  onPress={() => setDeleteModalVisible(false)}
+                  size="small"
+                  variant="primary"
+                />
+                <Button
+                  title="Excluir"
+                  onPress={handleConfirmDeleteEvent}
+                  size="small"
+                  variant="danger"
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
+
         {isAdmin && (
           <Text style={{ color: '#6B7280', fontSize: 12, marginTop: 24 }}>
             O CSV deve conter colunas: id (opcional), title, date (YYYY-MM-DD),

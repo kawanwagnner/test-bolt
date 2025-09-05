@@ -1,3 +1,23 @@
+export async function updatePublicEvent(event: Pick<PublicEvent, 'id'> & Partial<Omit<PublicEvent, 'id' | 'created_at'>>) {
+  const { id, ...fields } = event;
+  const { data, error } = await supabase
+    .from('public_events')
+    .update(fields)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as PublicEvent;
+}
+
+export async function deletePublicEvent(id: string) {
+  const { error } = await supabase
+    .from('public_events')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+  return true;
+}
 import { supabase } from '@/src/lib/supabase';
 
 export type PublicEvent = {

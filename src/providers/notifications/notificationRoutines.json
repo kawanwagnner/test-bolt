@@ -1,0 +1,14 @@
+[
+  {
+    "id": "check-events-morning",
+    "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    "time": "08:00",
+    "action": "checkEventsAndNotify"
+  },
+  {
+    "id": "no-events-message",
+    "days": ["Saturday", "Sunday"],
+    "time": "08:00",
+    "action": "showNoEventsMessage"
+  }
+]

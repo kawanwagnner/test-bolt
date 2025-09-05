@@ -1,23 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, SafeAreaView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Event } from '../admin/events-agenda';
-
-const STORAGE_KEY = 'admin_events_agenda';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  SafeAreaView,
+  RefreshControl,
+  Alert,
+} from 'react-native';
+import {
+  fetchPublicEvents,
+  PublicEvent,
+} from '@/src/features/events/publicEvents.api';
 
 export default function EventsListScreen() {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<PublicEvent[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadEvents = async () => {
+    setLoading(true);
+    try {
+      const allEvents = await fetchPublicEvents();
+      setEvents(allEvents);
+    } catch (err) {
+      Alert.alert('Erro', 'Não foi possível carregar os eventos.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadEvents();
   }, []);
-
-  const loadEvents = async () => {
-    const data = await AsyncStorage.getItem(STORAGE_KEY);
-    if (data) {
-      setEvents(JSON.parse(data));
-    }
-  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
@@ -36,6 +50,9 @@ export default function EventsListScreen() {
         )}
         ListEmptyComponent={
           <Text style={styles.empty}>Nenhum evento cadastrado.</Text>
+        }
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={loadEvents} />
         }
       />
     </SafeAreaView>

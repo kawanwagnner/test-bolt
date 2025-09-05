@@ -8,6 +8,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: false,
     shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -62,7 +64,7 @@ export async function scheduleLocalNotification(
         body,
         data: { identifier },
       },
-      trigger: { date },
+      trigger: { date } as any,
       identifier,
     });
   } catch (error) {
@@ -96,7 +98,7 @@ export async function scheduleAssignmentNotifications(
     `assignment_24h_${assignmentId}`
   );
 
-  // Schedule 48h reminder for teachers
+  // Schedule 48h and 6h reminders for teachers
   if (userIsTeacher) {
     const notify48h = subHours(slotStartTime, 48);
     await scheduleLocalNotification(
@@ -104,6 +106,14 @@ export async function scheduleAssignmentNotifications(
       'Lembrete de Escala (Professor)',
       `Você tem "${slotTitle}" em 48 horas - Prepare o material`,
       `assignment_48h_${assignmentId}`
+    );
+
+    const notify6h = subHours(slotStartTime, 6);
+    await scheduleLocalNotification(
+      notify6h,
+      'Lembrete de Escala (Professor)',
+      `Você tem "${slotTitle}" em 6 horas - Últimos preparativos!`,
+      `assignment_6h_${assignmentId}`
     );
   }
 }
