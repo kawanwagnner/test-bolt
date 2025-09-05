@@ -1,12 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  requestNotificationPermissions,
-  setupNotificationChannel,
-} from '@/src/lib/notifications';
+import { NotificationProvider } from '@/src/providers/notifications/NotificationProvider';
 
-// Create a client with offline persistence
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -18,21 +13,9 @@ const queryClient = new QueryClient({
 });
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    // Setup notifications on app start
-    setupNotifications();
-  }, []);
-
-  const setupNotifications = async () => {
-    try {
-      await requestNotificationPermissions();
-      await setupNotificationChannel();
-    } catch (error) {
-      console.error('Failed to setup notifications:', error);
-    }
-  };
-
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <NotificationProvider>{children}</NotificationProvider>
+    </QueryClientProvider>
   );
 }
