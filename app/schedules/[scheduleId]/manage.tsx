@@ -22,7 +22,6 @@ import {
   useUpdateSlot,
   useDeleteSlot,
 } from '@/src/features/slots/slots.api';
-import { useThemes } from '@/src/features/themes/themes.api';
 import { Input } from '@/src/components/Input';
 import { TimePickerField } from '@/src/components/TimePickerField';
 import { DatePickerField } from '@/src/components/DatePickerField';
@@ -35,11 +34,11 @@ import { SlotManualInvites } from '@/src/components/SlotManualInvites';
 import {
   ArrowLeft,
   Plus,
-  CreditCard as Edit3,
   Trash2,
   Clock,
   Users,
   Settings,
+  Pencil,
 } from 'lucide-react-native';
 
 export default function ManageScheduleScreen() {
@@ -174,7 +173,7 @@ export default function ManageScheduleScreen() {
             onPress={() => openModal(item)}
             style={styles.actionButton}
           >
-            <Edit3 size={18} color="#3B82F6" strokeWidth={2} />
+            <Pencil size={18} color="#3B82F6" strokeWidth={2} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handleDeleteSlot(item)}
