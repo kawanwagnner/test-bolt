@@ -29,10 +29,24 @@ export const slotSchema = z
     title: z.string().min(1, 'Título é obrigatório'),
     description: z.string().optional(),
     theme_id: z.string().optional(),
+    date: z
+      .string()
+      .regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/i, 'Data inválida (YYYY-MM-DD)')
+      .min(1, 'Data é obrigatória')
+      .refine(
+        (val) => {
+          const today = new Date();
+          const todayStr = today.toISOString().slice(0, 10);
+          return val >= todayStr; // comparação lexicográfica funciona em formato YYYY-MM-DD
+        },
+        'Data não pode estar no passado'
+      ),
     start_time: z.string().min(1, 'Horário de início é obrigatório'),
     end_time: z.string().min(1, 'Horário de fim é obrigatório'),
     mode: z.enum(['manual', 'livre']).default('livre'),
-    capacity: z.number().min(1, 'Capacidade deve ser pelo menos 1').default(1),
+    capacity: z
+      .number()
+      .min(1, 'Capacidade deve ser pelo menos 1'),
   })
   .refine(
     (data) => {

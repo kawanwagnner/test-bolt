@@ -15,7 +15,6 @@ import { Card } from '@/src/components/Card';
 import { Button } from '@/src/components/Button';
 import { EmptyState } from '@/src/components/EmptyState';
 import { LoadingSpinner } from '@/src/components/LoadingSpinner';
-// Removido status relativo; exibiremos badge estático "Ativo"
 import { Plus, Calendar, User } from 'lucide-react-native';
 
 export default function SchedulesScreen() {
@@ -68,11 +67,6 @@ export default function SchedulesScreen() {
           )}
           {item.notify_48h && (
             <Text style={styles.notificationText}>• Lembrete 48h</Text>
-          )}
-          {item.notify_48h_musician && (
-            <Text style={styles.notificationText}>
-              • Lembrete 48h (Músicos)
-            </Text>
           )}
         </View>
       </Card>

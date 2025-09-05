@@ -110,6 +110,7 @@ export type Database = {
           id: string;
           schedule_id: string;
           theme_id: string | null;
+          date: string | null; // new: separate slot date (YYYY-MM-DD)
           start_time: string | null;
           end_time: string | null;
           mode: 'manual' | 'livre';
@@ -123,6 +124,7 @@ export type Database = {
           id?: string;
           schedule_id: string;
           theme_id?: string | null;
+          date?: string | null;
           start_time?: string | null;
           end_time?: string | null;
           mode?: 'manual' | 'livre';
@@ -136,6 +138,7 @@ export type Database = {
           id?: string;
           schedule_id?: string;
           theme_id?: string | null;
+          date?: string | null;
           start_time?: string | null;
           end_time?: string | null;
           mode?: 'manual' | 'livre';

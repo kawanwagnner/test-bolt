@@ -514,16 +514,6 @@ export default function ScheduleDetailScreen() {
             {schedule.notify_24h && (
               <Text style={styles.notificationText}>• Lembrete 24h</Text>
             )}
-            {schedule.notify_48h && (
-              <Text style={styles.notificationText}>
-                • Lembrete 48h (Professores)
-              </Text>
-            )}
-            {(schedule as any).notify_48h_musician && (
-              <Text style={styles.notificationText}>
-                • Lembrete 48h (Músicos)
-              </Text>
-            )}
           </View>
         </Card>
 

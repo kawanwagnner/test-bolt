@@ -6,7 +6,8 @@ export function useSlotsBySchedule(scheduleId: string) {
   return useQuery({
     queryKey: ['slots', scheduleId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First attempt: order by date then start_time (multi-day support)
+      let { data, error } = await supabase
         .from('slots')
         .select(`
           *,
@@ -17,9 +18,28 @@ export function useSlotsBySchedule(scheduleId: string) {
           )
         `)
         .eq('schedule_id', scheduleId)
+        .order('date', { ascending: true, nullsFirst: true })
         .order('start_time', { ascending: true });
 
-      if (error) throw error;
+      // Fallback: in case migration (date column) not yet applied
+      if (error && /column .*date/i.test(error.message)) {
+        const fallback = await supabase
+          .from('slots')
+          .select(`
+            *,
+            theme:themes(*),
+            assignments(
+              id,
+              user:profiles!user_id(id, full_name)
+            )
+          `)
+          .eq('schedule_id', scheduleId)
+          .order('start_time', { ascending: true });
+        data = fallback.data;
+        error = fallback.error;
+      }
+
+      if (error) throw error;      
 
       return (data || []).map((slot: any) => ({
         ...slot,

@@ -25,6 +25,7 @@ import {
 import { useThemes } from '@/src/features/themes/themes.api';
 import { Input } from '@/src/components/Input';
 import { TimePickerField } from '@/src/components/TimePickerField';
+import { DatePickerField } from '@/src/components/DatePickerField';
 import { Button } from '@/src/components/Button';
 import { Card } from '@/src/components/Card';
 import { EmptyState } from '@/src/components/EmptyState';
@@ -38,6 +39,7 @@ import {
   Clock,
   Users,
   Settings,
+  Calendar,
 } from 'lucide-react-native';
 
 export default function ManageScheduleScreen() {
@@ -68,7 +70,8 @@ export default function ManageScheduleScreen() {
     resolver: zodResolver(slotSchema),
     defaultValues: {
       mode: 'livre',
-      capacity: 1,
+      // capacity começa vazio para permitir digitação livre
+      capacity: undefined as any,
     },
   });
 
@@ -79,6 +82,9 @@ export default function ManageScheduleScreen() {
         title: slot.title || '',
         description: slot.description || '',
         theme_id: slot.theme_id || '',
+        date: slot.start_time
+          ? slot.start_time.slice(0, 10)
+          : schedule?.date || new Date().toISOString().slice(0, 10),
         start_time: slot.start_time ? slot.start_time.slice(11, 16) : '',
         end_time: slot.end_time ? slot.end_time.slice(11, 16) : '',
         mode: slot.mode,
@@ -89,10 +95,11 @@ export default function ManageScheduleScreen() {
         title: '',
         description: '',
         theme_id: '',
+        date: schedule?.date || new Date().toISOString().slice(0, 10),
         start_time: '',
         end_time: '',
         mode: 'livre',
-        capacity: 1,
+        capacity: undefined as any,
       });
     }
     setModalVisible(true);
@@ -108,14 +115,13 @@ export default function ManageScheduleScreen() {
       const slotData = {
         ...data,
         schedule_id: scheduleId!,
+        // Monta start/end usando a data escolhida no slot
         start_time: data.start_time
-          ? `${schedule?.date}T${data.start_time}:00`
+          ? `${data.date}T${data.start_time}:00`
           : null,
-        end_time: data.end_time
-          ? `${schedule?.date}T${data.end_time}:00`
-          : null,
+        end_time: data.end_time ? `${data.date}T${data.end_time}:00` : null,
         theme_id: data.theme_id || null,
-      };
+      } as any;
 
       if (editingSlot) {
         await updateSlot.mutateAsync({ id: editingSlot.id, ...slotData });
@@ -302,11 +308,24 @@ export default function ManageScheduleScreen() {
 
               <Controller
                 control={control}
+                name="date"
+                render={({ field: { onChange, value } }) => (
+                  <DatePickerField
+                    label="Data do Slot"
+                    value={value as any}
+                    onChange={onChange}
+                    error={errors.date?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
                 name="title"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
                     label="Título"
-                    placeholder="Ex: Apresentação do projeto"
+                    placeholder="Ex: Louvor de Quinta"
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
@@ -371,8 +390,22 @@ export default function ManageScheduleScreen() {
                   <Input
                     label="Capacidade"
                     placeholder="1"
-                    value={value?.toString()}
-                    onChangeText={(text) => onChange(parseInt(text, 10) || 1)}
+                    value={
+                      value !== undefined && value !== null ? String(value) : ''
+                    }
+                    onChangeText={(text) => {
+                      if (text === '') {
+                        // permite limpar para depois digitar outro número
+                        // @ts-ignore
+                        onChange(undefined);
+                        return;
+                      }
+                      if (/^[0-9]+$/.test(text)) {
+                        const parsed = parseInt(text, 10);
+                        // @ts-ignore
+                        onChange(Number.isNaN(parsed) ? undefined : parsed);
+                      }
+                    }}
                     onBlur={onBlur}
                     error={errors.capacity?.message}
                     keyboardType="numeric"
