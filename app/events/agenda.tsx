@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import {
   View,
   Text,
@@ -15,7 +16,10 @@ const STORAGE_KEY = 'admin_events_agenda';
 
 export default function EventsAgendaScreen() {
   const [events, setEvents] = useState<Event[]>([]);
-  const [todayEvents, setTodayEvents] = useState<Event[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>(
+    new Date().toISOString().slice(0, 10)
+  );
+  const [eventsByDate, setEventsByDate] = useState<Record<string, Event[]>>({});
   const { schedule } = useNotification();
 
   useEffect(() => {
@@ -28,15 +32,21 @@ export default function EventsAgendaScreen() {
     if (data) {
       const allEvents: Event[] = JSON.parse(data);
       setEvents(allEvents);
-      const today = new Date().toISOString().slice(0, 10);
-      setTodayEvents(allEvents.filter((e) => e.date === today));
+      // Agrupa eventos por data
+      const grouped: Record<string, Event[]> = {};
+      allEvents.forEach((ev) => {
+        if (!grouped[ev.date]) grouped[ev.date] = [];
+        grouped[ev.date].push(ev);
+      });
+      setEventsByDate(grouped);
     }
   };
 
-  // Agenda notificação para eventos do dia (ao abrir a tela)
+  // Agenda notificação para eventos do dia selecionado
   useEffect(() => {
-    if (todayEvents.length > 0) {
-      todayEvents.forEach((event) => {
+    const todays = eventsByDate[selectedDate] || [];
+    if (todays.length > 0) {
+      todays.forEach((event) => {
         const now = new Date();
         const eventDate = new Date(event.date + 'T09:00:00');
         if (eventDate > now) {
@@ -49,40 +59,53 @@ export default function EventsAgendaScreen() {
         }
       });
     }
-  }, [todayEvents]);
+  }, [selectedDate, eventsByDate]);
+
+  // Marca os dias com eventos
+  const markedDates = Object.keys(eventsByDate).reduce((acc, date) => {
+    acc[date] = {
+      marked: true,
+      dotColor: '#3B82F6',
+      selected: date === selectedDate,
+      selectedColor: date === selectedDate ? '#3B82F6' : undefined,
+    };
+    return acc;
+  }, {} as Record<string, any>);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <View style={{ padding: 24 }}>
         <Text style={styles.title}>Agenda de Eventos</Text>
         <Text style={styles.subtitle}>Veja os próximos eventos do sistema</Text>
-        <FlatList
-          data={events}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Text style={styles.eventTitle}>{item.title}</Text>
-              <Text style={styles.eventDate}>{item.date}</Text>
-              {item.description ? (
-                <Text style={styles.eventDesc}>{item.description}</Text>
-              ) : null}
-            </View>
-          )}
-          ListEmptyComponent={
-            <Text style={styles.empty}>Nenhum evento cadastrado.</Text>
-          }
+        <Calendar
+          markedDates={markedDates}
+          onDayPress={(day) => setSelectedDate(day.dateString)}
+          theme={{
+            todayTextColor: '#0284C7',
+            selectedDayBackgroundColor: '#3B82F6',
+            dotColor: '#3B82F6',
+          }}
+          style={{ marginBottom: 24, borderRadius: 12, overflow: 'hidden' }}
         />
-        {todayEvents.length > 0 && (
-          <View style={styles.todayBox}>
-            <Text style={styles.todayTitle}>Eventos de hoje:</Text>
-            {todayEvents.map((ev) => (
-              <Text key={ev.id} style={styles.todayEvent}>
-                {ev.title}
-              </Text>
+        {eventsByDate[selectedDate] && eventsByDate[selectedDate].length > 0 ? (
+          <View>
+            <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
+              Eventos em {selectedDate}:
+            </Text>
+            {eventsByDate[selectedDate].map((item) => (
+              <View key={item.id} style={styles.card}>
+                <Text style={styles.eventTitle}>{item.title}</Text>
+                <Text style={styles.eventDate}>{item.date}</Text>
+                {item.description ? (
+                  <Text style={styles.eventDesc}>{item.description}</Text>
+                ) : null}
+              </View>
             ))}
           </View>
+        ) : (
+          <Text style={styles.empty}>Nenhum evento neste dia.</Text>
         )}
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
