@@ -24,6 +24,7 @@ import {
 } from '@/src/features/slots/slots.api';
 import { useThemes } from '@/src/features/themes/themes.api';
 import { Input } from '@/src/components/Input';
+import { TimePickerField } from '@/src/components/TimePickerField';
 import { Button } from '@/src/components/Button';
 import { Card } from '@/src/components/Card';
 import { EmptyState } from '@/src/components/EmptyState';
@@ -336,31 +337,26 @@ export default function ManageScheduleScreen() {
                 <Controller
                   control={control}
                   name="start_time"
-                  render={({ field: { onChange, onBlur, value } }) => (
+                  render={({ field: { onChange, value } }) => (
                     <View style={styles.timeInput}>
-                      <Input
+                      <TimePickerField
                         label="Início"
-                        placeholder="09:00"
                         value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
+                        onChange={onChange}
                         error={errors.start_time?.message}
                       />
                     </View>
                   )}
                 />
-
                 <Controller
                   control={control}
                   name="end_time"
-                  render={({ field: { onChange, onBlur, value } }) => (
+                  render={({ field: { onChange, value } }) => (
                     <View style={styles.timeInput}>
-                      <Input
+                      <TimePickerField
                         label="Fim"
-                        placeholder="10:00"
                         value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
+                        onChange={onChange}
                         error={errors.end_time?.message}
                       />
                     </View>

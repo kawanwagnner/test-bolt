@@ -104,6 +104,12 @@ export default function LoginScreen() {
             )}
           />
 
+          <View style={{ alignItems: 'flex-end', marginBottom: 8 }}>
+            <Link href="/auth/forgot-password" style={styles.forgotLink}>
+              Esqueci minha senha
+            </Link>
+          </View>
+
           <Button
             onPress={handleSubmit(onSubmit)}
             title="Entrar"
@@ -173,5 +179,12 @@ const styles = StyleSheet.create({
   link: {
     color: '#3B82F6',
     fontWeight: '600',
+  },
+  forgotLink: {
+    color: '#3B82F6',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+    fontSize: 15,
+    marginBottom: 2,
   },
 });

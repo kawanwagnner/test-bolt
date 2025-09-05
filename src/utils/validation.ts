@@ -23,15 +23,27 @@ export const scheduleSchema = z.object({
   notify_48h: z.boolean().default(false),
 });
 
-export const slotSchema = z.object({
-  title: z.string().min(1, 'Título é obrigatório'),
-  description: z.string().optional(),
-  theme_id: z.string().optional(),
-  start_time: z.string().min(1, 'Horário de início é obrigatório'),
-  end_time: z.string().min(1, 'Horário de fim é obrigatório'),
-  mode: z.enum(['manual', 'livre']).default('livre'),
-  capacity: z.number().min(1, 'Capacidade deve ser pelo menos 1').default(1),
-});
+export const slotSchema = z
+  .object({
+    title: z.string().min(1, 'Título é obrigatório'),
+    description: z.string().optional(),
+    theme_id: z.string().optional(),
+    start_time: z.string().min(1, 'Horário de início é obrigatório'),
+    end_time: z.string().min(1, 'Horário de fim é obrigatório'),
+    mode: z.enum(['manual', 'livre']).default('livre'),
+    capacity: z.number().min(1, 'Capacidade deve ser pelo menos 1').default(1),
+  })
+  .refine(
+    (data) => {
+      if (!data.start_time || !data.end_time) return true;
+      // compara como string 'HH:mm', funciona para horários no mesmo dia
+      return data.end_time > data.start_time;
+    },
+    {
+      message: 'O horário de fim deve ser após o início',
+      path: ['end_time'],
+    }
+  );
 
 export const themeSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),

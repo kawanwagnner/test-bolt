@@ -1,7 +1,17 @@
 import { Tabs } from 'expo-router';
-import { Chrome as Home, Calendar, User } from 'lucide-react-native';
+import { Chrome as Home, Calendar, User, BookOpen } from 'lucide-react-native';
+import { useAuth } from '@/src/features/auth/useAuth';
+import { useMemo } from 'react';
 
 export default function TabLayout() {
+  const { isAdmin } = useAuth();
+  const agendaScreen = useMemo(
+    () =>
+      isAdmin
+        ? { name: 'admin/events-agenda', title: 'Agenda', icon: BookOpen }
+        : { name: 'events/agenda', title: 'Agenda', icon: BookOpen },
+    [isAdmin]
+  );
   return (
     <Tabs
       screenOptions={{
@@ -38,6 +48,15 @@ export default function TabLayout() {
           title: 'Escalas',
           tabBarIcon: ({ size, color }) => (
             <Calendar size={size} color={color} strokeWidth={2} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name={agendaScreen.name}
+        options={{
+          title: agendaScreen.title,
+          tabBarIcon: ({ size, color }) => (
+            <agendaScreen.icon size={size} color={color} strokeWidth={2} />
           ),
         }}
       />

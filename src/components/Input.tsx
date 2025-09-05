@@ -1,5 +1,13 @@
-import React, { forwardRef } from 'react';
-import { TextInput, View, Text, StyleSheet, TextInputProps } from 'react-native';
+import React, { forwardRef, useState } from 'react';
+import {
+  TextInput,
+  View,
+  Text,
+  StyleSheet,
+  TextInputProps,
+  TouchableOpacity,
+} from 'react-native';
+import { Eye, EyeOff } from 'lucide-react-native';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -8,20 +16,39 @@ interface InputProps extends TextInputProps {
 }
 
 export const Input = forwardRef<TextInput, InputProps>(
-  ({ label, error, helperText, style, ...props }, ref) => {
+  ({ label, error, helperText, style, secureTextEntry, ...props }, ref) => {
+    const [show, setShow] = useState(false);
+    const isPassword = typeof secureTextEntry !== 'undefined';
     return (
       <View style={styles.container}>
         {label && <Text style={styles.label}>{label}</Text>}
-        <TextInput
-          ref={ref}
-          style={[
-            styles.input,
-            error && styles.inputError,
-            style,
-          ]}
-          placeholderTextColor="#9CA3AF"
-          {...props}
-        />
+        <View style={{ position: 'relative' }}>
+          <TextInput
+            ref={ref}
+            style={[
+              styles.input,
+              error && styles.inputError,
+              style,
+              isPassword && { paddingRight: 44 },
+            ]}
+            placeholderTextColor="#9CA3AF"
+            secureTextEntry={isPassword ? !show : undefined}
+            {...props}
+          />
+          {isPassword && (
+            <TouchableOpacity
+              style={styles.eyeBtn}
+              onPress={() => setShow((v) => !v)}
+              accessibilityLabel={show ? 'Esconder senha' : 'Mostrar senha'}
+            >
+              {show ? (
+                <EyeOff size={22} color="#6B7280" />
+              ) : (
+                <Eye size={22} color="#6B7280" />
+              )}
+            </TouchableOpacity>
+          )}
+        </View>
         {error && <Text style={styles.errorText}>{error}</Text>}
         {helperText && !error && (
           <Text style={styles.helperText}>{helperText}</Text>
@@ -32,6 +59,17 @@ export const Input = forwardRef<TextInput, InputProps>(
 );
 
 const styles = StyleSheet.create({
+  eyeBtn: {
+    position: 'absolute',
+    right: 10,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 32,
+    height: '100%',
+    zIndex: 2,
+  },
   container: {
     marginBottom: 16,
   },

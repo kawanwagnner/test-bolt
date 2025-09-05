@@ -20,6 +20,8 @@ import { Card } from '@/src/components/Card';
 import { scheduleSchema, ScheduleInput } from '@/src/utils/validation';
 import { Calendar, ArrowLeft, Bell, Clock } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { format } from 'date-fns';
 
 export default function CreateScheduleScreen() {
   const router = useRouter();
@@ -54,6 +56,10 @@ export default function CreateScheduleScreen() {
       Alert.alert('Erro', error.message || 'Não foi possível criar a escala');
     }
   };
+
+  // Date picker state
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dateObj, setDateObj] = useState<Date | null>(null);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -118,16 +124,39 @@ export default function CreateScheduleScreen() {
             <Controller
               control={control}
               name="date"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  label="Data"
-                  placeholder="YYYY-MM-DD"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.date?.message}
-                  helperText="Formato: YYYY-MM-DD (ex: 2025-12-31)"
-                />
+              render={({ field: { onChange, value } }) => (
+                <>
+                  <Text style={{ fontWeight: '600', marginBottom: 4 }}>
+                    Data
+                  </Text>
+                  <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                    <View pointerEvents="none">
+                      <Input
+                        placeholder="Selecione a data"
+                        value={dateObj ? format(dateObj, 'dd/MM/yyyy') : ''}
+                        editable={false}
+                        error={errors.date?.message}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                  <DateTimePickerModal
+                    isVisible={showDatePicker}
+                    mode="date"
+                    onConfirm={(date) => {
+                      setDateObj(date);
+                      setShowDatePicker(false);
+                      onChange(format(date, 'yyyy-MM-dd'));
+                    }}
+                    onCancel={() => setShowDatePicker(false)}
+                    locale="pt-BR"
+                    minimumDate={new Date()}
+                  />
+                  {errors.date?.message ? (
+                    <Text style={{ color: '#EF4444', fontSize: 12 }}>
+                      {errors.date.message}
+                    </Text>
+                  ) : null}
+                </>
               )}
             />
           </Card>
