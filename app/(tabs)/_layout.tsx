@@ -1,19 +1,25 @@
 import { Tabs } from 'expo-router';
-import { Calendar, User, BookOpen, HomeIcon, Users } from 'lucide-react-native';
+import { Calendar, User, HomeIcon, Users, Plus } from 'lucide-react-native';
 import { useAuth } from '@/src/features/auth/useAuth';
 import { useMemo } from 'react';
+import { usePathname, useRouter } from 'expo-router';
+import { TouchableOpacity, StyleSheet, View, Text } from 'react-native';
 
 export default function TabLayout() {
   const { isAdmin } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const isOnSchedulesIndex = Boolean(pathname && /\/schedules(\/)?$/.test(pathname));
   const agendaScreen = useMemo(
     () =>
       isAdmin
-        ? { name: 'admin/events-agenda', title: 'Agenda', icon: BookOpen }
-        : { name: 'events/agenda', title: 'Agenda', icon: BookOpen },
+        ? { name: 'admin/events-agenda', title: 'Agenda', icon: Calendar }
+        : { name: 'events/agenda', title: 'Agenda', icon: Calendar },
     [isAdmin]
   );
   return (
-    <Tabs
+    <>
+      <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#3B82F6',
@@ -65,7 +71,7 @@ export default function TabLayout() {
         options={{
           title: 'Eventos',
           tabBarIcon: ({ size, color }) => (
-            <BookOpen size={size} color={color} strokeWidth={2} />
+            <Calendar size={size} color={color} strokeWidth={2} />
           ),
         }}
       />
@@ -88,5 +94,74 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+  {isAdmin && isOnSchedulesIndex ? (
+        <View pointerEvents="box-none" style={{ position: 'absolute', right: 0, bottom: 0 }}>
+          <View style={styles.fabRow} pointerEvents="box-none">
+            <TouchableOpacity
+              style={styles.pill}
+              onPress={() => router.push('/admin/announcements')}
+              accessibilityLabel="Ver comunicados"
+            >
+              <Text style={styles.pillText}>Comunicados</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.fab}
+              onPress={() => router.push('/admin/announcements')}
+              accessibilityLabel="Abrir comunicados"
+            >
+              <Plus size={20} color="#FFFFFF" strokeWidth={2} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : null}
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  adminButton: {
+    backgroundColor: '#3B82F6',
+    padding: 8,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 92,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#3B82F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  fabRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginRight: 16,
+    marginBottom: 92,
+  },
+  pill: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  pillText: {
+    color: '#111827',
+    fontWeight: '700',
+  },
+});

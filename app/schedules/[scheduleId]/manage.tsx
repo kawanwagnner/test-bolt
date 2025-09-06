@@ -299,176 +299,183 @@ export default function ManageScheduleScreen() {
             <View style={styles.placeholder} />
           </View>
 
-          <ScrollView
-            style={styles.modalContent}
-            showsVerticalScrollIndicator={false}
-          >
-            <Card variant="elevated">
-              <View style={styles.formHeader}>
-                <Settings size={24} color="#3B82F6" strokeWidth={2} />
-                <Text style={styles.formTitle}>Informações do Slot</Text>
-              </View>
+          <FlatList
+            data={[]}
+            renderItem={() => null}
+            keyExtractor={() => Math.random().toString()}
+            ListHeaderComponent={() => (
+              <>
+                <Card variant="elevated">
+                  <View style={styles.formHeader}>
+                    <Settings size={24} color="#3B82F6" strokeWidth={2} />
+                    <Text style={styles.formTitle}>Informações do Slot</Text>
+                  </View>
 
-              <Controller
-                control={control}
-                name="date"
-                render={({ field: { onChange, value } }) => (
-                  <DatePickerField
-                    label="Data do Slot"
-                    value={value as any}
-                    onChange={onChange}
-                    error={errors.date?.message}
-                  />
-                )}
-              />
-
-              <Controller
-                control={control}
-                name="title"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    label="Título"
-                    placeholder="Ex: Louvor de Quinta"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    error={errors.title?.message}
-                  />
-                )}
-              />
-
-              <Controller
-                control={control}
-                name="description"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    label="Descrição (opcional)"
-                    placeholder="Descreva o slot..."
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    error={errors.description?.message}
-                    multiline
-                    numberOfLines={2}
-                    style={{ height: 60, textAlignVertical: 'top' }}
-                  />
-                )}
-              />
-
-              <View style={styles.timeRow}>
-                <Controller
-                  control={control}
-                  name="start_time"
-                  render={({ field: { onChange, value } }) => (
-                    <View style={styles.timeInput}>
-                      <TimePickerField
-                        label="Início"
-                        value={value}
+                  <Controller
+                    control={control}
+                    name="date"
+                    render={({ field: { onChange, value } }) => (
+                      <DatePickerField
+                        label="Data do Slot"
+                        value={value as any}
                         onChange={onChange}
-                        error={errors.start_time?.message}
+                        error={errors.date?.message}
                       />
-                    </View>
-                  )}
-                />
-                <Controller
-                  control={control}
-                  name="end_time"
-                  render={({ field: { onChange, value } }) => (
-                    <View style={styles.timeInput}>
-                      <TimePickerField
-                        label="Fim"
-                        value={value}
-                        onChange={onChange}
-                        error={errors.end_time?.message}
-                      />
-                    </View>
-                  )}
-                />
-              </View>
-
-              <Controller
-                control={control}
-                name="capacity"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    label="Capacidade"
-                    placeholder="1"
-                    value={
-                      value !== undefined && value !== null ? String(value) : ''
-                    }
-                    onChangeText={(text) => {
-                      if (text === '') {
-                        // permite limpar para depois digitar outro número
-                        // @ts-ignore
-                        onChange(undefined);
-                        return;
-                      }
-                      if (/^[0-9]+$/.test(text)) {
-                        const parsed = parseInt(text, 10);
-                        // @ts-ignore
-                        onChange(Number.isNaN(parsed) ? undefined : parsed);
-                      }
-                    }}
-                    onBlur={onBlur}
-                    error={errors.capacity?.message}
-                    keyboardType="numeric"
+                    )}
                   />
-                )}
-              />
 
-              <Controller
-                control={control}
-                name="mode"
-                render={({ field: { value, onChange } }) => (
-                  <View style={styles.switchContainer}>
-                    <View style={styles.switchInfo}>
-                      <Text style={styles.switchLabel}>Modo de Inscrição</Text>
-                      <Text style={styles.switchDescription}>
-                        {value === 'livre'
-                          ? 'Inscrição livre (automática)'
-                          : 'Inscrição manual (admin escolhe quem participa)'}
-                      </Text>
-                    </View>
-                    <Switch
-                      value={value === 'manual'}
-                      onValueChange={(isManual) =>
-                        onChange(isManual ? 'manual' : 'livre')
-                      }
-                      trackColor={{ false: '#10B981', true: '#F59E0B' }}
-                      thumbColor={value === 'manual' ? '#FFFFFF' : '#FFFFFF'}
+                  <Controller
+                    control={control}
+                    name="title"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <Input
+                        label="Título"
+                        placeholder="Ex: Louvor de Quinta"
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        error={errors.title?.message}
+                      />
+                    )}
+                  />
+
+                  <Controller
+                    control={control}
+                    name="description"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <Input
+                        label="Descrição (opcional)"
+                        placeholder="Descreva o slot..."
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        error={errors.description?.message}
+                        multiline
+                        numberOfLines={2}
+                        style={{ height: 60, textAlignVertical: 'top' }}
+                      />
+                    )}
+                  />
+
+                  <View style={styles.timeRow}>
+                    <Controller
+                      control={control}
+                      name="start_time"
+                      render={({ field: { onChange, value } }) => (
+                        <View style={styles.timeInput}>
+                          <TimePickerField
+                            label="Início"
+                            value={value}
+                            onChange={onChange}
+                            error={errors.start_time?.message}
+                          />
+                        </View>
+                      )}
+                    />
+                    <Controller
+                      control={control}
+                      name="end_time"
+                      render={({ field: { onChange, value } }) => (
+                        <View style={styles.timeInput}>
+                          <TimePickerField
+                            label="Fim"
+                            value={value}
+                            onChange={onChange}
+                            error={errors.end_time?.message}
+                          />
+                        </View>
+                      )}
                     />
                   </View>
-                )}
-              />
 
-              {editingSlot?.id && modeWatch === 'manual' && (
-                <View style={{ marginTop: 4 }}>
-                  <SlotManualInvites slotId={editingSlot.id} />
-                </View>
-              )}
-              {!editingSlot && modeWatch === 'manual' && (
-                <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
-                  Salve o slot primeiro para então adicionar convites manuais.
-                </Text>
-              )}
-            </Card>
+                  <Controller
+                    control={control}
+                    name="capacity"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <Input
+                        label="Capacidade"
+                        placeholder="1"
+                        value={
+                          value !== undefined && value !== null ? String(value) : ''
+                        }
+                        onChangeText={(text) => {
+                          if (text === '') {
+                            // permite limpar para depois digitar outro número
+                            // @ts-ignore
+                            onChange(undefined);
+                            return;
+                          }
+                          if (/^[0-9]+$/.test(text)) {
+                            const parsed = parseInt(text, 10);
+                            // @ts-ignore
+                            onChange(Number.isNaN(parsed) ? undefined : parsed);
+                          }
+                        }}
+                        onBlur={onBlur}
+                        error={errors.capacity?.message}
+                        keyboardType="numeric"
+                      />
+                    )}
+                  />
 
-            <View style={styles.modalActions}>
-              <Button
-                onPress={closeModal}
-                title="Cancelar"
-                variant="outline"
-                size="large"
-              />
-              <Button
-                // @ts-ignore
-                onPress={handleSubmit(onSubmit)}
-                title={editingSlot ? 'Salvar' : 'Criar'}
-                size="large"
-                loading={createSlot.isPending || updateSlot.isPending}
-              />
-            </View>
-          </ScrollView>
+                  <Controller
+                    control={control}
+                    name="mode"
+                    render={({ field: { value, onChange } }) => (
+                      <View style={styles.switchContainer}>
+                        <View style={styles.switchInfo}>
+                          <Text style={styles.switchLabel}>Modo de Inscrição</Text>
+                          <Text style={styles.switchDescription}>
+                            {value === 'livre'
+                              ? 'Inscrição livre (automática)'
+                              : 'Inscrição manual (admin escolhe quem participa)'}
+                          </Text>
+                        </View>
+                        <Switch
+                          value={value === 'manual'}
+                          onValueChange={(isManual) =>
+                            onChange(isManual ? 'manual' : 'livre')
+                          }
+                          trackColor={{ false: '#10B981', true: '#F59E0B' }}
+                          thumbColor={value === 'manual' ? '#FFFFFF' : '#FFFFFF'}
+                        />
+                      </View>
+                    )}
+                  />
+
+                  {editingSlot?.id && modeWatch === 'manual' && (
+                    <View style={{ marginTop: 4 }}>
+                      <SlotManualInvites slotId={editingSlot.id} />
+                    </View>
+                  )}
+                  {!editingSlot && modeWatch === 'manual' && (
+                    <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>
+                      Salve o slot primeiro para então adicionar convites manuais.
+                    </Text>
+                  )}
+                </Card>
+              </>
+            )}
+            ListFooterComponent={() => (
+              <View style={styles.modalActions}>
+                <Button
+                  onPress={closeModal}
+                  title="Cancelar"
+                  variant="outline"
+                  size="large"
+                />
+                <Button
+                  // @ts-ignore
+                  onPress={handleSubmit(onSubmit)}
+                  title={editingSlot ? 'Salvar' : 'Criar'}
+                  size="large"
+                  loading={createSlot.isPending || updateSlot.isPending}
+                />
+              </View>
+            )}
+            contentContainerStyle={styles.modalContent}
+            showsVerticalScrollIndicator={false}
+          />
         </SafeAreaView>
       </Modal>
     </SafeAreaView>

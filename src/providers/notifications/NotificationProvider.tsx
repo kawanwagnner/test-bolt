@@ -14,6 +14,8 @@ import {
   cancelAssignmentNotifications,
 } from '@/src/lib/notifications';
 import { fetchPublicEvents } from '@/src/features/events/publicEvents.api';
+import { supabase } from '@/src/lib/supabase';
+import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import notificationRoutines from './notificationRoutines.json';
 import { useRoutineEncouragement } from './useRoutineEncouragement';
@@ -44,6 +46,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [permissionsGranted, setPermissionsGranted] = useState(false);
+  const qc = useQueryClient();
 
   // Função utilitária para normalizar o status de permissão
   const isGranted = (result: { status: string }) => result.status === 'granted';
@@ -137,6 +140,25 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
         await setupNotificationChannel();
       }
     })();
+
+    // Subscribe to announcements table for realtime notifications
+    const channel = supabase.channel('public:announcements').on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'announcements' },
+      (payload) => {
+        const row = payload.new as any;
+        // Invalidate announcements query so UI updates
+        qc.invalidateQueries({ queryKey: ['announcements'] });
+        // Show local notification to user
+        (async () => {
+          await scheduleLocalNotification(new Date(), row.title || 'COMUNICADO', row.message || '', `announcement_${row.id}`);
+        })();
+      }
+    ).subscribe();
+
+    return () => {
+      try { channel.unsubscribe(); } catch (e) {}
+    };
   }, []);
 
   return (

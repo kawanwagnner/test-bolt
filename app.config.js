@@ -11,9 +11,13 @@ export default {
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     ios: {
-      supportsTablet: true,
+  supportsTablet: true,
+  // inferred bundle identifier — change if you have a different reverse-domain identifier
+  bundleIdentifier: 'com.kawanwnn.escalasapp',
     },
     android: {
+  // inferred package name — change if you have a different reverse-domain identifier
+  package: 'com.kawanwnn.escalasapp',
       adaptiveIcon: {
         foregroundImage: './assets/images/favicon.png',
         backgroundColor: '#ffffff',
@@ -23,6 +27,12 @@ export default {
       bundler: 'metro',
       output: 'single',
       favicon: './assets/images/favicon.png',
+    },
+    updates: {
+      url: 'https://u.expo.dev/5ea64157-7087-4d8d-b0dc-9397afec56f8',
+    },
+    runtimeVersion: {
+      policy: 'appVersion',
     },
     plugins: [
       'expo-router',
@@ -44,6 +54,9 @@ export default {
     extra: {
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
       supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+      eas: {
+        projectId: '5ea64157-7087-4d8d-b0dc-9397afec56f8',
+      },
     },
   },
 };

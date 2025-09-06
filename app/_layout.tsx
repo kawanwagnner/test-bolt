@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AppProvider } from '@/src/providers/AppProvider';

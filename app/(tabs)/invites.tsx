@@ -12,11 +12,13 @@ import {
   useMySlotInvites,
   useRespondSlotInvite,
 } from '@/src/features/invites/slotInvites.api';
+import { useAnnouncements } from '@/src/features/announcements/announcements.api';
 import { useRouter } from 'expo-router';
 
 export default function InvitesScreen() {
   const { data: invites, isLoading, refetch } = useMySlotInvites();
   const respond = useRespondSlotInvite();
+  const { data: announcements } = useAnnouncements();
   const router = useRouter();
 
   return (
@@ -31,6 +33,19 @@ export default function InvitesScreen() {
           <RefreshControl refreshing={isLoading} onRefresh={refetch} />
         }
         contentContainerStyle={{ padding: 16, gap: 12 }}
+        ListHeaderComponent={() => (
+          announcements && announcements.length > 0 ? (
+            <View style={{ marginBottom: 12 }}>
+              <Text style={{ fontSize: 16, fontWeight: '700', marginBottom: 8 }}>Comunicados</Text>
+              {announcements.map(a => (
+                <View key={a.id} style={{ backgroundColor: '#FFFFFF', padding: 12, borderRadius: 8, marginBottom: 8 }}>
+                  <Text style={{ fontWeight: '700' }}>{a.title}</Text>
+                  {a.message ? <Text style={{ color: '#374151', marginTop: 6 }}>{a.message}</Text> : null}
+                </View>
+              ))}
+            </View>
+          ) : null
+        )}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={{ flex: 1 }}>
