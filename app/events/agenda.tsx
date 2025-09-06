@@ -26,13 +26,14 @@ import { Button } from '@/src/components/Button';
 import * as DocumentPicker from 'expo-document-picker';
 import { parse } from 'papaparse';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function EventsAgendaScreen() {
   const [events, setEvents] = useState<PublicEvent[]>([]);
+  // Use local date format to match dates stored in the DB and the calendar
   const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().slice(0, 10)
+    format(new Date(), 'yyyy-MM-dd')
   );
   const [eventsByDate, setEventsByDate] = useState<
     Record<string, PublicEvent[]>
@@ -68,14 +69,11 @@ export default function EventsAgendaScreen() {
     if (todays.length > 0) {
       todays.forEach((event) => {
         const now = new Date();
-        const eventDate = new Date(event.date + 'T09:00:00');
+        // parse the event date in local timezone and set a consistent hour
+        const eventDate = parseISO(event.date);
+        eventDate.setHours(9, 0, 0, 0);
         if (eventDate > now) {
-          schedule(
-            eventDate,
-            'Evento do dia',
-            event.title,
-            `event_${event.id}`
-          );
+          schedule(eventDate, 'Evento do dia', event.title, `event_${event.id}`);
         }
       });
     }

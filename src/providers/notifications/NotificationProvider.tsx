@@ -27,6 +27,7 @@ interface NotificationContextProps {
   cancel: typeof cancelNotification;
   scheduleAssignment: typeof scheduleAssignmentNotifications;
   cancelAssignment: typeof cancelAssignmentNotifications;
+  initialized: boolean;
 }
 
 const NotificationContext = createContext<NotificationContextProps | undefined>(
@@ -46,6 +47,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [permissionsGranted, setPermissionsGranted] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const qc = useQueryClient();
 
   // Função utilitária para normalizar o status de permissão
@@ -138,7 +140,17 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
       setPermissionsGranted(granted);
       if (granted) {
         await setupNotificationChannel();
+        // run today's check immediately on startup so routines are triggered
+        // independent of user navigation
+        try {
+          await checkEventsAndNotify();
+        } catch (e) {
+          // swallow errors from initial routine run
+        }
       }
+      // mark provider as initialized after initial permission check, channel setup
+      // and after running the initial routines
+      setInitialized(true);
     })();
 
     // Subscribe to announcements table for realtime notifications
@@ -170,6 +182,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
         cancel: cancelNotification,
         scheduleAssignment: scheduleAssignmentNotifications,
         cancelAssignment: cancelAssignmentNotifications,
+  initialized,
       }}
     >
       {children}

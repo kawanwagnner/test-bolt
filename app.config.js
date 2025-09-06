@@ -11,13 +11,17 @@ export default {
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     ios: {
-  supportsTablet: true,
-  // inferred bundle identifier — change if you have a different reverse-domain identifier
-  bundleIdentifier: 'com.kawanwnn.escalasapp',
+      supportsTablet: true,
+      // inferred bundle identifier — change if you have a different reverse-domain identifier
+      bundleIdentifier: 'com.kawanwnn.escalasapp',
+      // keep build number in sync with version
+      buildNumber: '1',
     },
     android: {
-  // inferred package name — change if you have a different reverse-domain identifier
-  package: 'com.kawanwnn.escalasapp',
+      // inferred package name — change if you have a different reverse-domain identifier
+      package: 'com.kawanwnn.escalasapp',
+      // explicit versionCode can help with CI and reproducible builds
+      versionCode: 1,
       adaptiveIcon: {
         foregroundImage: './assets/images/favicon.png',
         backgroundColor: '#ffffff',
@@ -28,8 +32,19 @@ export default {
       output: 'single',
       favicon: './assets/images/favicon.png',
     },
+    // bundle static assets with the app to avoid runtime fetches
+    assetBundlePatterns: ['**/*'],
+    // splash screen for a smoother startup on native platforms
+    splash: {
+      image: './assets/images/icon.png',
+      resizeMode: 'contain',
+      backgroundColor: '#ffffff',
+    },
     updates: {
       url: 'https://u.expo.dev/5ea64157-7087-4d8d-b0dc-9397afec56f8',
+      // fallbackToCacheTimeout controls how long the app waits for remote updates
+      // 0 = immediately use cached bundle if available; tweak if you want network-first
+      fallbackToCacheTimeout: 0,
     },
     runtimeVersion: {
       policy: 'appVersion',
